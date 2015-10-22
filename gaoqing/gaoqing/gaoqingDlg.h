@@ -21,6 +21,23 @@ public:
 //===============HIK Variables==================
 	LOCAL_DEVICE_INFO m_struDeviceInfo;
 	LONG m_lPlayHandle;
+	BOOL m_bIsLogin;
+
+	CIPAddressCtrl	m_ctrlDevIp;
+	UINT	m_nDevPort;
+	CString	m_csUser;
+	CString	m_csPWD;
+	HTREEITEM m_hDevItem;
+	BOOL m_bIsPlaying;
+	BOOL m_bIsRecording;
+	//function
+	BOOL DoLogin();
+	void DoGetDeviceResoureCfg();
+	void GetDecoderCfg();
+	afx_msg void OnClose();
+	void StopPlay();
+	void StopRecord();
+	void StartPlay(int iChanIndex);
 //==============================================
 
 // Implementation
@@ -34,4 +51,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedCancel();
+public:
+	afx_msg void OnLogin();
+public:
+	afx_msg void OnBnClickedButton2();
 };
