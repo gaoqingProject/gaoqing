@@ -38,6 +38,7 @@ public:
 	void StopPlay();
 	void StopRecord();
 	void StartPlay(int iChanIndex);
+	void StartRecord();
 //==============================================
 
 // Implementation

@@ -383,6 +383,28 @@ void CgaoqingDlg::StartPlay(int iChanIndex)
 	//GetDlgItem(IDC_BUTTON_PLAY)->SetWindowText("停止播放");
 
 }
+/*************************************************
+函数名:    	StartRecord
+函数描述:	开始录像
+输入参数:   
+输出参数:   			
+返回值:		
+**************************************************/
+void CgaoqingDlg::StartRecord()
+{
+	char RecName[256] = {0};
+	
+	CTime CurTime = CTime::GetCurrentTime();;
+	sprintf(RecName,"%04d%02d%02d%02d%02d%02d_ch%02d.mp4",CurTime.GetYear(),CurTime.GetMonth(),CurTime.GetDay(), \
+		CurTime.GetHour(),CurTime.GetMinute(),CurTime.GetSecond(),m_struDeviceInfo.struChanInfo[0].iChanIndex);
+
+	 if(!NET_DVR_SaveRealData(m_lPlayHandle,RecName))
+	 {
+		 MessageBox("启动录像失败");
+		 return;
+	 }
+     m_bIsRecording = TRUE;
+}
 void CgaoqingDlg::OnClose() 
 {
 	//=================HIK=========================
@@ -398,6 +420,16 @@ void CgaoqingDlg::OnClose()
 void CgaoqingDlg::OnBnClickedButton2()
 {
 	 StartPlay(0);
-		 m_bIsPlaying = TRUE;
+	//	 m_bIsPlaying = TRUE;
 	// TODO: Add your control notification handler code here
+
+
+		if(!m_bIsRecording)
+	{
+		StartRecord();
+	}
+	else
+	{
+        StopRecord();
+	}
 }
