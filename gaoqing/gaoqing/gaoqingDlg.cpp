@@ -4,17 +4,12 @@
 #include "stdafx.h"
 #include "gaoqing.h"
 #include "gaoqingDlg.h"
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
 // CgaoqingDlg dialog
-
-
-
-
 CgaoqingDlg::CgaoqingDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CgaoqingDlg::IDD, pParent)
 {
@@ -25,6 +20,7 @@ CgaoqingDlg::CgaoqingDlg(CWnd* pParent /*=NULL*/)
 	m_bIsPlaying = FALSE;
 	m_bIsRecording = FALSE;
 	//====================================
+	
 }
 
 void CgaoqingDlg::DoDataExchange(CDataExchange* pDX)
@@ -35,16 +31,16 @@ void CgaoqingDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_PORT, m_nDevPort);
 	DDX_Text(pDX, IDC_EDIT_USER, m_csUser);
 	DDX_Text(pDX, IDC_EDIT_PWD, m_csPWD);
-
-
 }
 
 BEGIN_MESSAGE_MAP(CgaoqingDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	//}}AFX_MSG_MAP
 	ON_BN_CLICKED(IDC_BUTTON_LOGIN, &CgaoqingDlg::OnLogin)
 	ON_BN_CLICKED(IDC_BUTTON2, &CgaoqingDlg::OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_BUTTON3, &CgaoqingDlg::OnBnClickedButton3)
+	ON_STN_CLICKED(IDC_STATIC_PLAYa, &CgaoqingDlg::OnStnClickedStaticPlaya)
+	ON_EN_CHANGE(IDC_EDIT_PORT, &CgaoqingDlg::OnEnChangeEditPort)
 END_MESSAGE_MAP()
 
 
@@ -54,8 +50,6 @@ BOOL CgaoqingDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// Set the icon for this dialog.  The framework does this automatically
-	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
@@ -65,7 +59,7 @@ BOOL CgaoqingDlg::OnInitDialog()
 
 	//=================step 1 ===================
 	NET_DVR_CLIENTINFO ClientInfo;
-	ClientInfo.hPlayWnd     = GetDlgItem(IDC_STATIC_PLAY)->m_hWnd;
+	//ClientInfo.hPlayWnd     = GetDlgItem(IDC_STATIC_PLAYb)->m_hWnd;
 	ClientInfo.lChannel     = 1;
 	ClientInfo.lLinkMode    = 0;
     ClientInfo.sMultiCastIP = NULL;
@@ -96,6 +90,12 @@ BOOL CgaoqingDlg::OnInitDialog()
 	 {
 	 }
 	//=====================================================================
+	m_ctrlDevIp.SetAddress(0xc0a81240);
+	m_csUser="admin";
+	m_csPWD="admin123";
+	m_nDevPort=8000;
+	UpdateData(false);
+
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -302,7 +302,7 @@ void CgaoqingDlg::StopPlay()
 		NET_DVR_StopRealPlay(m_lPlayHandle);
 		m_lPlayHandle=-1;
 		m_bIsPlaying = FALSE;
-		GetDlgItem(IDC_STATIC_PLAY)->Invalidate();
+		GetDlgItem(IDC_STATIC_PLAYb)->Invalidate();
 	}
 }
 /*************************************************
@@ -365,7 +365,7 @@ void CgaoqingDlg::OnLogin()
 void CgaoqingDlg::StartPlay(int iChanIndex)
 {
 	NET_DVR_CLIENTINFO ClientInfo;
-	ClientInfo.hPlayWnd     = GetDlgItem(IDC_STATIC_PLAY)->m_hWnd;
+	//ClientInfo.hPlayWnd     = GetDlgItem(IDC_STATIC_PLAYb)->m_hWnd;
 	ClientInfo.lChannel     = 1;
 	ClientInfo.lLinkMode    = 0;
     ClientInfo.sMultiCastIP = NULL;
@@ -395,7 +395,7 @@ void CgaoqingDlg::StartRecord()
 	char RecName[256] = {0};
 	
 	CTime CurTime = CTime::GetCurrentTime();;
-	sprintf(RecName,"%04d%02d%02d%02d%02d%02d_ch%02d.mp4",CurTime.GetYear(),CurTime.GetMonth(),CurTime.GetDay(), \
+	sprintf(RecName,"test.mp4",CurTime.GetYear(),CurTime.GetMonth(),CurTime.GetDay(), \
 		CurTime.GetHour(),CurTime.GetMinute(),CurTime.GetSecond(),m_struDeviceInfo.struChanInfo[0].iChanIndex);
 
 	 if(!NET_DVR_SaveRealData(m_lPlayHandle,RecName))
@@ -432,4 +432,59 @@ void CgaoqingDlg::OnBnClickedButton2()
 	{
         StopRecord();
 	}
+}
+
+//==========================================play record ========================
+#define TIMER_INTERVAL 500//local play back timer refresh interval
+#define USED_PORT 99		//card decode port
+/*********************************************************
+  Function:	PlayBack
+  Desc:		playback video files
+  Input:	
+  Output:	
+  Return:	
+**********************************************************/
+void CgaoqingDlg::PlayBack()
+{
+	int iFilePosSel = 0;
+	CString csFileName="test.mp4";//path of video file
+	CString csDeviceIP;
+	CString csTemp;
+	CString sTemp1;
+	int nPos = 0;
+	char szLan[128] = {0};
+	
+
+	if (!PlayM4_OpenFile(USED_PORT, csFileName.GetBuffer(csFileName.GetLength())))
+	{
+		//g_pMainDlg->AddLog(m_iDeviceIndex, OPERATION_FAIL_T, "PlayM4_OpenFile %d", PlayM4_GetLastError(USED_PORT));
+		return;
+	}
+	
+	m_hPlayWnd = GetDlgItem(IDC_STATIC_PLAYa)->m_hWnd;
+
+	if (PlayM4_Play(USED_PORT,m_hPlayWnd)==FALSE)
+	{
+		PlayM4_CloseFile(USED_PORT);
+		//g_pMainDlg->AddLog(m_iDeviceIndex, PLAY_FAIL_T, "PlayM4_Play err[%d]", PlayM4_GetLastError(USED_PORT));
+		return;
+	}
+}
+void CgaoqingDlg::OnBnClickedButton3()
+{
+	PlayBack();
+}
+void CgaoqingDlg::OnStnClickedStaticPlaya()
+{
+	// TODO: Add your control notification handler code here
+}
+
+void CgaoqingDlg::OnEnChangeEditPort()
+{
+	// TODO:  If this is a RICHEDIT control, the control will not
+	// send this notification unless you override the CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask()
+	// with the ENM_CHANGE flag ORed into the mask.
+
+	// TODO:  Add your control notification handler code here
 }

@@ -39,6 +39,8 @@ public:
 	void StopRecord();
 	void StartPlay(int iChanIndex);
 	void StartRecord();
+	void PlayBack();
+	HWND m_hPlayWnd;
 //==============================================
 
 // Implementation
@@ -56,4 +58,10 @@ public:
 	afx_msg void OnLogin();
 public:
 	afx_msg void OnBnClickedButton2();
+public:
+	afx_msg void OnBnClickedButton3();
+public:
+	afx_msg void OnStnClickedStaticPlaya();
+public:
+	afx_msg void OnEnChangeEditPort();
 };

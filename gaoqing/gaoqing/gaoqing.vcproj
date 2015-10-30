@@ -67,7 +67,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="HCNetSDK.lib"
+				AdditionalDependencies="GdiPlus.lib HCNetSDK.lib PlayCtrl.lib ws2_32.lib winmm.lib IPHlpApi.Lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -199,6 +199,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HikController.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -230,6 +234,10 @@
 			</File>
 			<File
 				RelativePath=".\gaoqingDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HikController.h"
 				>
 			</File>
 			<File
