@@ -3,8 +3,8 @@
 #define GENERALDEF_H
 
 #include "HCNetSDK.h"
-#include "plaympeg4.h"
-
+#include "PlayM4.h"
+//#include "plaympeg4.h"
 #define MAX_CHANS      24              //设备支持的最大通道数
 #define MAX_DEVICE     10             //最大设备数
 #define MAX_OUTPUTS	   16	//16最大的窗口数

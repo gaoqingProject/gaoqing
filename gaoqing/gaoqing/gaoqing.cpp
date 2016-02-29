@@ -51,7 +51,7 @@ BOOL CgaoqingApp::InitInstance()
 	AfxEnableControlContainer();
 
 	//===============================HIK Process=======================
-	NET_DVR_Init();
+	
 	//=================================================================
 
 	// Standard initialization
