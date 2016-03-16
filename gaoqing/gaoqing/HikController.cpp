@@ -1,277 +1,294 @@
+/*
+File name:   HikController.cpp
+File Author: Li Weichen
+Date:        2016.3.1
+*/
 #include "StdAfx.h"
 #include "HikController.h"
+//====================== Camera Variables Definition ===================
 #define channelNO 0
+//====================== Definition End ================================
 
-
-HikController::HikController(void): play_no(-1)
+HikController::HikController(void): mPlay_no(-1),handle(-1),rec(false)
 {
-	
+
 }
+/*************************************************
+Function:  initHik
+Desc:	   初始化sdk
+Input:     void
+Return:	   void
+**************************************************/
 void HikController::initHik(void)
 {
-	//=================================HIK Operation=======================
 	NET_DVR_Init();
-	
 }
+/*************************************************
+Function:   playtimeHik
+Desc:	    获取当前文件的播放长度
+Input:      void
+Return:		0 -- FAIL
+            others -- 文件播放长度
+**************************************************/
 DWORD HikController::playtimeHik()
 {
-	DWORD time = PlayM4_GetFileTime(play_no);
-	LONG pt = PlayM4_GetPort(&pt);
-	if (!PlayM4_OpenFile(pt, file.GetBuffer(file.GetLength())))
+	DWORD time;
+	LONG pt; 
+	PlayM4_GetPort(&pt);//get a port
+	if (!PlayM4_OpenFile(pt, file.GetBuffer(file.GetLength())))//open file
 	{
-		//g_pMainDlg->AddLog(m_iDeviceIndex, OPERATION_FAIL_T, "PlayM4_OpenFile %d", PlayM4_GetLastError(USED_PORT));
-		return 0;
+		return 0;//open failed
 	}
-	time = PlayM4_GetFileTime(pt);
+	time = PlayM4_GetFileTime(pt); // get time in unit of second
 
-	PlayM4_CloseFile(pt);
-	PlayM4_FreePort(pt);
+	PlayM4_CloseFile(pt);//close file
+	PlayM4_FreePort(pt);// release port
 	return time;
 }
+/*************************************************
+Function:   playedtimeHik
+Desc:	    获取播放时间
+Input:      void
+Return:		播放时间（ms）
+**************************************************/
 DWORD HikController::playedtimeHik()
 {
-	return PlayM4_GetPlayedTimeEx(play_no);
+	return PlayM4_GetPlayedTimeEx(mPlay_no);
 }
+/*************************************************
+Function:   playposHik
+Desc:	    设置播放位置
+Input:      播放时间位置（ms）
+Return:		FAIL -- 失败
+            SUCCESS -- 成功
+**************************************************/
 int HikController::playposHik(DWORD pos)
 {
-	if(play_no == -1  || pos ==0)
-		return SUCESS;
-	if (!PlayM4_SetPlayedTimeEx(play_no, pos))
+	if(mPlay_no == -1)
+		return SUCCESS;
+	if (!PlayM4_SetPlayedTimeEx(mPlay_no, pos))
 	{
 		return FAIL;
 	}else{
-		return SUCESS;
+		return SUCCESS;
 	}
 }
+/*************************************************
+Function:   resumeHik
+Desc:	    暂停播放
+Input:      void
+Return:		FAIL -- 失败
+            SUCCESS -- 成功
+**************************************************/
 bool HikController::resumeHik()
 {
-	if(play_no == -1)
-		return SUCESS;
-	if (!PlayM4_Pause(play_no,FALSE))
+	if(mPlay_no == -1)
+		return SUCCESS;
+	if (!PlayM4_Pause(mPlay_no,FALSE))
 	{
 		return FAIL;
 	}else{
-		return SUCESS;
+		return SUCCESS;
 	}
 }
+/*************************************************
+Function:   pauseHik
+Desc:	    暂停播放
+Input:      void
+Return:		FAIL -- 失败
+            SUCCESS -- 成功
+**************************************************/
 bool HikController::pauseHik()
 {
-	if(play_no == -1)
-		return SUCESS;
-	if (!PlayM4_Pause(play_no,TRUE))
+	if(mPlay_no == -1)
+		return SUCCESS;
+	if (!PlayM4_Pause(mPlay_no,TRUE))
 	{
 		return FAIL;
 	}else{
-		return SUCESS;
+		return SUCCESS;
 	}
 }
+/*************************************************
+Function:   fastHik
+Desc:	    播放快进
+Input:      void
+Return:		FAIL -- 失败
+            SUCCESS -- 成功
+**************************************************/
 bool HikController::fastHik()
 {
-	if(play_no == -1)
-		return SUCESS;
-	if (!PlayM4_Fast(play_no))
+	if(mPlay_no == -1)
+		return SUCCESS;
+	if (!PlayM4_Fast(mPlay_no))
 	{
 		return FAIL;
 	}else{
-		return SUCESS;
+		return SUCCESS;
 	}
 }
-bool HikController::slowHik()
+/*************************************************
+Function:   slowHik
+Desc:	    播放慢放
+Input:      times 慢放倍数 0<=times<=4
+Return:		FAIL -- 失败
+            SUCCESS -- 成功
+**************************************************/
+bool HikController::slowHik(int times)
 {
-	if(play_no == -1)
-		return SUCESS;
-	if (!PlayM4_Slow(play_no))
+	if(mPlay_no == -1)
+		return SUCCESS;
+	int cn = times>4?4:times;
+	if(cn<0)
+		times=0;
+
+	for(int i=0;i<times;i++)
 	{
-		return FAIL;
-	}else{
-		return SUCESS;
+		if (!PlayM4_Slow(mPlay_no))
+		{
+			return FAIL;
+		}else{
+			return SUCCESS;
+		}
 	}
 }
+/*************************************************
+Function:   playHik
+Desc:	    继续播放
+Input:      void
+Return:		FAIL -- 失败
+            SUCCESS -- 成功
+**************************************************/
+/*
 bool HikController::playHik()
 {
-	if(play_no == -1)
-		return SUCESS;
-	if (!PlayM4_Play(play_no,wind))
+	if(mPlay_no == -1)
+		return SUCCESS;
+	if (!PlayM4_Play(mPlay_no,wind))
 	{
 		return FAIL;
 	}else{
-		return SUCESS;
+		return SUCCESS;
 	}
-}
+}*/
+/*************************************************
+Function:   FileRefDoneCB
+Desc:	    建立索引文件回调函数
+Input:      DWORD nPort 端口
+            void* nUser 用户数据
+Return:		void
+**************************************************/
 void CALLBACK HikController::FileRefDoneCB(DWORD nPort,void* nUser)
 {
 	HikController *ct = static_cast<HikController*>((void*)nUser);
-       ct->g_bRefDone = TRUE;
-}
-
-void CALLBACK HikController::test(
-  long        nPort,
-  char        *pBuf,
-  long        nSize,
- FRAME_INFO  *pFrameInfo,
-  void*        nUser,
-  void*        nReserved2
-  ){
-	  if(nSize != 0){
-	  
-		  HikController *ct = static_cast<HikController*>((void*)nUser);
-		ct->g_test=TRUE;
-	  }
-
+	ct->g_bRefDone = TRUE; // assign mark to have loaded file
 }
 /*********************************************************
-  Function:	PlayBack
-  Desc:		播放视频
-  Input:	
-  Output:	
-  Return:	SUCESS 成功
-            ERROR_FAIL_OPEN_FILE   文件打开失败
-			ERROR_FAIL_OPEN_WINDOW 视频输出到窗口失败
+Function:	PlayBack
+Desc:		开始播放视频
+Input:	    播放文件名
+Return:	    SUCCESS -- 成功
+            ERROR_FAIL_OPEN_FILE -- 文件打开失败
+            ERROR_FAIL_OPEN_WINDOW -- 视频输出到窗口失败
 **********************************************************/
 int HikController::playbackHik(CString filename)
 {
 
 	int iFilePosSel = 0;
-	//CString csFileName="test.mp4";//path of video file
-	//CString csDeviceIP;
-	//CString csTemp;
-	//CString sTemp1;
-	//int nPos = 0;
-	//char szLan[128] = {0};
 	file=filename;
-	PlayM4_Stop(play_no);
-	PlayM4_CloseFile(play_no);
+	PlayM4_Stop(mPlay_no);
+	PlayM4_CloseFile(mPlay_no);
 
 
 	g_bRefDone = FALSE;
 	g_test = FALSE;
-	PlayM4_SetFileRefCallBack(play_no,&HikController::FileRefDoneCB,(void *)this);
-	//PlayM4_SetDecCallBackMend(play_no,&HikController::test,(void *)this);
+	PlayM4_SetFileRefCallBack(mPlay_no,&HikController::FileRefDoneCB,(void *)this);
 
-	if (!PlayM4_OpenFile(play_no, filename.GetBuffer(filename.GetLength())))
+	if (!PlayM4_OpenFile(mPlay_no, filename.GetBuffer(filename.GetLength())))
 	{
-		//g_pMainDlg->AddLog(m_iDeviceIndex, OPERATION_FAIL_T, "PlayM4_OpenFile %d", PlayM4_GetLastError(USED_PORT));
 		return ERROR_FAIL_OPEN_FILE;
 	}
-	
 
-	if (PlayM4_Play(play_no,wind)==FALSE)
+
+	if (PlayM4_Play(mPlay_no,mWind)==FALSE)
 	{
-		
-		PlayM4_CloseFile(play_no);
-		//g_pMainDlg->AddLog(m_iDeviceIndex, PLAY_FAIL_T, "PlayM4_Play err[%d]", PlayM4_GetLastError(USED_PORT));
+
+		PlayM4_CloseFile(mPlay_no);
 		return ERROR_FAIL_OPEN_WINDOW;
 	}
 
 	while (g_bRefDone == FALSE)
-    {
+	{
 		Sleep(2);
 	}
-
-	/*while (g_test == FALSE)
-    {
-		Sleep(2);
-	}*/
-
-	/*DWORD frame;
-	do{
-		frame = PlayM4_GetCurrentFrameNum(play_no);
-	}while(!frame);*/
-
 	Sleep(500);
-	return SUCESS;
+	return SUCCESS;
 }
-void HikController::playslowHik()
-{
-	PlayM4_Slow(play_no);
-	//PlayM4_Slow(play_no);
-	//PlayM4_Slow(play_no);
-	//PlayM4_Slow(play_no);
-}
+
 
 /*********************************************************
-  Function:	stopplaybackHik
-  Desc:		停止播放视频
-  Input:	
-  Output:	
-  Return:	SUCESS 成功
+Function:	stopplaybackHik
+Desc:		停止播放视频
+Input:	
+Return:  	SUCCESS 成功
             ERROR_FAIL_OPEN_FILE   文件打开失败
-			ERROR_FAIL_OPEN_WINDOW 视频输出到窗口失败
+            ERROR_FAIL_OPEN_WINDOW 视频输出到窗口失败
 **********************************************************/
 int HikController::stopplaybackHik()
 {
-		PlayM4_Stop(play_no);
-		PlayM4_CloseFile(play_no);
-		return SUCESS;
+	PlayM4_Stop(mPlay_no);
+	PlayM4_CloseFile(mPlay_no);
+	return SUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*************************************************
-函数名:    	stopPlayHik
-函数描述:	停止播放
-输入参数:   
-输出参数:   			
-返回值:		SUCESS 成功
+Function:   stopplayliveHik
+Desc:	    停止播放
+Input:   	
+Return:		SUCCESS 成功
             FAIL   失败
 **************************************************/
-bool HikController::stopPlayHik()
+bool HikController::stopplayliveHik()
 {
 	if(handle != -1)
 	{
-		
+
 		NET_DVR_StopRealPlay(handle);
 		handle=-1;
-		return SUCESS;
+		return SUCCESS;
 	}
 	return FAIL;
 }
 /*************************************************
-函数名:    	stopFileHik
-函数描述:	停止录像
-输入参数:   
-输出参数:   			
-返回值:		SUCESS 成功
+Function:   stopFileHik
+Desc:	    停止录像
+Input:   
+Return:		SUCCESS 成功
             FAIL   失败
 **************************************************/
-bool HikController::stopFileHik()
+/*bool HikController::stopFileHik()
 {
-    if(!NET_DVR_StopSaveRealData(handle))
+	if(!NET_DVR_StopSaveRealData(handle))
 	{
 		//MessageBox("停止录像失败");
 		return FAIL;
 	}
-	return SUCESS;
-	
-}
+	return SUCCESS;
+
+}*/
 /*************************************************
-函数名:    	DoGetDeviceResoureCfg
-函数描述:	获得设备资源配置
-输入参数:   设备info
-            channel号
-输出参数:   			
-返回值:		
+Function:   DoGetDeviceResoureCfg
+Desc:	    获得设备资源配置
+Input:      设备info
+            channel号	
+Return:		void
 **************************************************/
-void HikController::DoGetDeviceResoureCfg(LOCAL_DEVICE_INFO *info,LONG channel)
+void HikController::dogetdeviceresourecfgHik(LOCAL_DEVICE_INFO *info,LONG channel)
 {
 	NET_DVR_IPPARACFG_V40 IpAccessCfg;
 	memset(&IpAccessCfg,0,sizeof(IpAccessCfg));	
 	DWORD  dwReturned;
 
-	
+
 
 	info->bIPRet = NET_DVR_GetDVRConfig( \
 		(*info).lLoginID, \
@@ -283,7 +300,7 @@ void HikController::DoGetDeviceResoureCfg(LOCAL_DEVICE_INFO *info,LONG channel)
 		);
 
 	int i;
-    if(!info->bIPRet)   //不支持ip接入,9000以下设备不支持禁用模拟通道
+	if(!info->bIPRet)   //不支持ip接入,9000以下设备不支持禁用模拟通道
 	{
 		for(i=0; i<MAX_ANALOG_CHANNUM; i++)
 		{
@@ -292,7 +309,7 @@ void HikController::DoGetDeviceResoureCfg(LOCAL_DEVICE_INFO *info,LONG channel)
 				sprintf(info->struChanInfo[i].chChanName,"camera%d",i+info->iStartChan);
 				info->struChanInfo[i].iChanIndex=i+info->iStartChan;  //通道号
 				info->struChanInfo[i].bEnable = TRUE;
-				
+
 			}
 			else
 			{
@@ -318,7 +335,7 @@ void HikController::DoGetDeviceResoureCfg(LOCAL_DEVICE_INFO *info,LONG channel)
 				{
 					info->struChanInfo[i].bEnable = FALSE;
 				}
-				
+
 			}
 			else//clear the state of other channel
 			{
@@ -334,163 +351,158 @@ void HikController::DoGetDeviceResoureCfg(LOCAL_DEVICE_INFO *info,LONG channel)
 			if(IpAccessCfg.struStreamMode[i].uGetStream.struChanInfo.byEnable)  //ip通道在线
 			{
 				info->struChanInfo[i+MAX_ANALOG_CHANNUM].bEnable = TRUE;
-                info->struChanInfo[i+MAX_ANALOG_CHANNUM].iChanIndex = i+IpAccessCfg.dwStartDChan;
+				info->struChanInfo[i+MAX_ANALOG_CHANNUM].iChanIndex = i+IpAccessCfg.dwStartDChan;
 				sprintf(info->struChanInfo[i+MAX_ANALOG_CHANNUM].chChanName,"IP Camera %d",i+1);
 
 			}
 			else
 			{
-               info->struChanInfo[i+MAX_ANALOG_CHANNUM].bEnable = FALSE;
-			   info->struChanInfo[i+MAX_ANALOG_CHANNUM].iChanIndex = -1;
+				info->struChanInfo[i+MAX_ANALOG_CHANNUM].bEnable = FALSE;
+				info->struChanInfo[i+MAX_ANALOG_CHANNUM].iChanIndex = -1;
 			}
 		}
-		
-		
+
+
 	}
 
 }
 /*************************************************
-函数名:    	GetDecoderCfg
-函数描述:	获得解码器配置
-输入参数:   设备info
-输出参数:   			
-返回值:		
+Function:   GetDecoderCfg
+Desc:	    获得解码器配置
+Input:      设备info
+Return:		void
 **************************************************/
-void HikController::GetDecoderCfg(LOCAL_DEVICE_INFO *info)
+void HikController::getdecodercfgHik(LOCAL_DEVICE_INFO *info)
 {
-     NET_DVR_DECODERCFG_V30 DecoderCfg;
-	 DWORD  dwReturned;
-	 BOOL bRet;
-		
-      
-	 //获取通道解码器信息
-	 for(int i=0; i<MAX_CHANNUM_V30; i++)
-	 {
-		 if(info->struChanInfo[i].bEnable)
-		 {
-			 memset(&DecoderCfg,0,sizeof(NET_DVR_DECODERCFG_V30));
-			 bRet = NET_DVR_GetDVRConfig(info->lLoginID,NET_DVR_GET_DECODERCFG_V30 , \
-				info->struChanInfo[i].iChanIndex,&DecoderCfg,sizeof(NET_DVR_DECODERCFG_V30),&dwReturned);
-			 if(!bRet)
-			 {
-				 TRACE("Get DecderCfg failed,Chan:%d\n",info->struChanInfo[i].iChanIndex);
-				 continue;
-			 }
+	NET_DVR_DECODERCFG_V30 DecoderCfg;
+	DWORD  dwReturned;
+	BOOL bRet;
 
-			 memcpy(&info->struChanInfo[i].struDecodercfg,&DecoderCfg,sizeof(NET_DVR_DECODERCFG_V30));
-		 }
-		 
-	 }
+	//获取通道解码器信息
+	for(int i=0; i<MAX_CHANNUM_V30; i++)
+	{
+		if(info->struChanInfo[i].bEnable)
+		{
+			memset(&DecoderCfg,0,sizeof(NET_DVR_DECODERCFG_V30));
+			bRet = NET_DVR_GetDVRConfig(info->lLoginID,NET_DVR_GET_DECODERCFG_V30 , \
+				info->struChanInfo[i].iChanIndex,&DecoderCfg,sizeof(NET_DVR_DECODERCFG_V30),&dwReturned);
+			if(!bRet)
+			{
+				TRACE("Get DecderCfg failed,Chan:%d\n",info->struChanInfo[i].iChanIndex);
+				continue;
+			}
+
+			memcpy(&info->struChanInfo[i].struDecodercfg,&DecoderCfg,sizeof(NET_DVR_DECODERCFG_V30));
+		}
+
+	}
 
 }
 
 //=======================================================11.5======================================================
 
 /*************************************************
-函数名:    	displayHik
-函数描述:	显示输出
-输入参数:   设备info
-输出参数:   			
-返回值:		handle 成功
+Function:   playliveHik
+Desc:	    直播录像
+Input:      设备info
+Return:		handle 成功
             FAIL 失败
 **************************************************/
-bool HikController::displayHik()
+bool HikController::playliveHik(bool isPlay)
 {
-	/*NET_DVR_CLIENTINFO ClientInfo;
-	ClientInfo.hPlayWnd     = (HWND)0;
-									//handle of display window
-	ClientInfo.lChannel     = 1;	//channel no
-	ClientInfo.lLinkMode    = 0;	//bit 31 ----0:main stream 
-									//bit 0-30 ----0:tcp 1:udp 2:multi cast
-    ClientInfo.sMultiCastIP = NULL; //multi cast ip
-*/
 
 	NET_DVR_PREVIEWINFO ClientInfo = {0};
-	//ClientInfo.hPlayWnd     = GetDlgItem(IDC_STATIC_PLAY)->m_hWnd;
 	ClientInfo.lChannel     = 1;
 	ClientInfo.dwStreamType    = 0;
-    ClientInfo.dwLinkMode = 0;
+	ClientInfo.dwLinkMode = 0;
 
+	if(handle != -1){
+		NET_DVR_StopRealPlay(handle);
+	}
+	
+
+	if(isPlay){
+		ClientInfo.hPlayWnd = mWind;
+	}else{
+		ClientInfo.hPlayWnd = NULL;
+	}
 
 
 	TRACE("Channel number:%d\n",ClientInfo.lChannel);
-	//handle = NET_DVR_RealPlay_V30(m_struDeviceInfo.lLoginID,&ClientInfo,NULL,NULL,TRUE);
 	handle = NET_DVR_RealPlay_V40(m_struDeviceInfo.lLoginID,&ClientInfo,NULL,NULL);
+		
 	if(-1 == handle)
 	{
 		DWORD err=NET_DVR_GetLastError();
 
 		return FAIL;
 	}
-	return SUCESS;
+	return SUCCESS;
 
 }
-void HikController::stopdisplayHik()
+/*************************************************
+Function:   stopplayliveHik
+Desc:	    停止直播录像
+Input:      设备info
+Return:		handle 成功
+            FAIL 失败
+**************************************************/
+/*void HikController::stopplayliveHik()
 {
 	NET_DVR_StopRealPlay(handle);
 	handle=-1;
-}
+}*/
 /*************************************************
-函数名:    	saveFileHik
-函数描述:	保存录像
-输入参数:   设备info
-输出参数:   			
-返回值:		SUCESS 成功
+Function:   savefileHik
+Desc:	    保存录像
+Input:      设备info
+Return:		SUCCESS 成功
             FAIL 失败
 **************************************************/
-bool HikController::saveFileHik(CString file)
+bool HikController::savefileHik(CString file)
 {
-
-	/*char RecName[256] = {0};
-	
-	CTime CurTime = CTime::GetCurrentTime();;
-	sprintf( \
-		RecName, \
-		"%04d%02d%02d%02d%02d%02d_ch%02d.mp4", \
-		CurTime.GetYear(), \
-		CurTime.GetMonth(), \
-		CurTime.GetDay(), \
-		CurTime.GetHour(), \
-		CurTime.GetMinute(), \
-		CurTime.GetSecond(), \
-		info.struChanInfo[0].iChanIndex \
-		);*/
 	char *RecName=file.GetBuffer(file.GetLength());
 	if(NET_DVR_SaveRealData(handle,RecName))
 	{
-		return SUCESS;
+		return SUCCESS;
 	}else{
 		return FAIL;
 	}
 
 }
-bool HikController::stopsaveFileHik()
+/*************************************************
+Function:   stopsavefileHik
+Desc:	    停止保存录像
+Input:      设备info
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
+bool HikController::stopsavefileHik()
 {
 	if(!NET_DVR_StopSaveRealData(handle))
 	{
 		return FAIL;
 	}
-	return SUCESS;
+	return SUCCESS;
 }
 /*************************************************
-函数名:    	loginHik
-函数描述:	注册设备
-输入参数:   设备ip 端口 用户名 密码 设备info
-输出参数:   			
-返回值:		SUCESS 成功
+Function:   loginHik
+Desc:	    注册设备
+Input:      设备ip 端口 用户名 密码 设备info
+Return:		SUCCESS 成功
             FAIL 失败
 **************************************************/
 int HikController::loginHik()
 {
-	
+
 	NET_DVR_DEVICEINFO_V30 DeviceInfoTmp;
 	memset(&DeviceInfoTmp,0,sizeof(NET_DVR_DEVICEINFO_V30));
-	
+
 	LONG lLoginID = NET_DVR_Login_V30( \
-		ip.GetBuffer(ip.GetLength()), \
-		port, \
-		name.GetBuffer(name.GetLength()), \
-		pwd.GetBuffer(pwd.GetLength()), \
+		mIp.GetBuffer(mIp.GetLength()), \
+		mPort, \
+		mName.GetBuffer(mName.GetLength()), \
+		mPwd.GetBuffer(mPwd.GetLength()), \
 		&DeviceInfoTmp \
 		);
 	if(lLoginID == -1)
@@ -502,10 +514,10 @@ int HikController::loginHik()
 	m_struDeviceInfo.iDeviceChanNum = DeviceInfoTmp.byChanNum;
 	m_struDeviceInfo.iIPChanNum = DeviceInfoTmp.byIPChanNum;
 	m_struDeviceInfo.iStartChan  = DeviceInfoTmp.byStartChan;
-    m_struDeviceInfo.iIPStartChan  = DeviceInfoTmp.byStartDChan;
+	m_struDeviceInfo.iIPStartChan  = DeviceInfoTmp.byStartDChan;
 
-	DoGetDeviceResoureCfg(&m_struDeviceInfo,channelNO);  //获取设备资源信息	
-	GetDecoderCfg(&m_struDeviceInfo);                           //获取云台解码器信息 
+	dogetdeviceresourecfgHik(&m_struDeviceInfo,channelNO);  //获取设备资源信息	
+	getdecodercfgHik(&m_struDeviceInfo);                           //获取云台解码器信息 
 
 	DWORD returnLen;
 	NET_DVR_COMPRESSIONCFG_V30 para = {0};
@@ -520,36 +532,20 @@ int HikController::loginHik()
 		para.struNormHighRecordPara.byStreamSmooth = 50; //smooth 50
 
 		NET_DVR_SetDVRConfig(m_struDeviceInfo.lLoginID, NET_DVR_SET_COMPRESSCFG_V30, DeviceInfoTmp.byStartChan, &para, sizeof(NET_DVR_COMPRESSIONCFG_V30));
-	
-	
 	}
 
 
-	return SUCESS;
+	return SUCCESS;
 }
+/*************************************************
+Function:   saveParamHik
+Desc:	    保存参数到相机
+Input:      亮度 对比度 锐度 饱和度 曝光模式 曝光时间 日夜模式
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 int HikController::saveParamHik(BYTE brightness,BYTE contrast,BYTE sharpness,BYTE saturation,int exp_mode,int exp_time,int daynight)
 {
-	/*
-	NET_DVR_MULTI_STREAM_COMPRESSIONCFG_COND m_struMSCond;
-	NET_DVR_MULTI_STREAM_COMPRESSIONCFG m_struMSCompressionCfg;
-	DWORD dwStatus;
-
-	//memset(&m_struMSCond, 0, sizeof(NET_DVR_MULTI_STREAM_COMPRESSIONCFG_COND));
-	memset(&m_struMSCond,0,sizeof(NET_DVR_MULTI_STREAM_COMPRESSIONCFG_COND));
-	m_struMSCond.dwSize = sizeof(NET_DVR_MULTI_STREAM_COMPRESSIONCFG);
-
-	m_struMSCond.struStreamInfo.dwChannel = m_struDeviceInfo.iIPStartChan;
-	m_struMSCond.struStreamInfo.dwSize = sizeof(NET_DVR_STREAM_INFO);
-	m_struMSCond.dwStreamType = 0;
-	if (!NET_DVR_SetDeviceConfig(m_struDeviceInfo.lLoginID, NET_DVR_SET_MULTI_STREAM_COMPRESSIONCFG, 0,
-				&m_struMSCond, sizeof(NET_DVR_MULTI_STREAM_COMPRESSIONCFG_COND), &dwStatus, &m_struMSCompressionCfg, sizeof(NET_DVR_MULTI_STREAM_COMPRESSIONCFG)))	
-	{
-
-		return FAIL;
-	}else{
-		return SUCESS;
-	
-	}*/
 	DWORD returnLen;
 	NET_DVR_CAMERAPARAMCFG para = {0};
 	int re = NET_DVR_GetDVRConfig(m_struDeviceInfo.lLoginID, NET_DVR_GET_CCDPARAMCFG, m_struDeviceInfo.iStartChan, &para, sizeof(NET_DVR_CAMERAPARAMCFG), &returnLen);
@@ -567,46 +563,30 @@ int HikController::saveParamHik(BYTE brightness,BYTE contrast,BYTE sharpness,BYT
 		para.struDayNight.byDayNightFilterType =daynight; //日夜切换：0-白天，1-夜晚，2-自动，3-定时，4-报警输入触发
 
 		if(NET_DVR_SetDVRConfig(m_struDeviceInfo.lLoginID, NET_DVR_SET_CCDPARAMCFG, m_struDeviceInfo.iStartChan, &para, sizeof(NET_DVR_CAMERAPARAMCFG))){
-	
-			return SUCESS;
+
+			return SUCCESS;
 		}else{
 			return FAIL;
 		}
-	
+
 	}else{
 		return FAIL;
 	}
 }
+/*************************************************
+Function:   saveParamHik
+Desc:	    从相机获取参数
+Input:      void
+Return:		亮度 对比度 锐度 饱和度 曝光模式 曝光时间 日夜模式
+			0--失败
+**************************************************/
 PARAM_STRU HikController::getParamHik()
 {
-	/*
-	NET_DVR_MULTI_STREAM_COMPRESSIONCFG_COND m_struMSCond;
-	NET_DVR_MULTI_STREAM_COMPRESSIONCFG m_struMSCompressionCfg;
-	DWORD dwStatus;
-
-	//memset(&m_struMSCond, 0, sizeof(NET_DVR_MULTI_STREAM_COMPRESSIONCFG_COND));
-	memset(&m_struMSCond,0,sizeof(NET_DVR_MULTI_STREAM_COMPRESSIONCFG_COND));
-	m_struMSCond.dwSize = sizeof(NET_DVR_MULTI_STREAM_COMPRESSIONCFG);
-
-	m_struMSCond.struStreamInfo.dwChannel = m_struDeviceInfo.iIPStartChan;
-	m_struMSCond.struStreamInfo.dwSize = sizeof(NET_DVR_STREAM_INFO);
-	m_struMSCond.dwStreamType = 0;
-	if (!NET_DVR_SetDeviceConfig(m_struDeviceInfo.lLoginID, NET_DVR_SET_MULTI_STREAM_COMPRESSIONCFG, 0,
-				&m_struMSCond, sizeof(NET_DVR_MULTI_STREAM_COMPRESSIONCFG_COND), &dwStatus, &m_struMSCompressionCfg, sizeof(NET_DVR_MULTI_STREAM_COMPRESSIONCFG)))	
-	{
-
-		return FAIL;
-	}else{
-		return SUCESS;
-	
-	}*/
 	DWORD returnLen;
 	NET_DVR_CAMERAPARAMCFG para = {0};
 	int re = NET_DVR_GetDVRConfig(m_struDeviceInfo.lLoginID, NET_DVR_GET_CCDPARAMCFG, m_struDeviceInfo.iStartChan, &para, sizeof(NET_DVR_CAMERAPARAMCFG), &returnLen);
 	PARAM_STRU str;
 	if(re){
-
-		
 		str.brightness = para.struVideoEffect.byBrightnessLevel; //standard h264
 		str.contrast = para.struVideoEffect.byContrastLevel; //standard h264
 		str.sharpness = para.struVideoEffect.bySharpnessLevel; //standard h264
@@ -617,10 +597,6 @@ PARAM_STRU HikController::getParamHik()
 
 		str.daynight = para.struDayNight.byDayNightFilterType; /*日夜切换：0-白天，1-夜晚，2-自动，3-定时，4-报警输入触发*/ 
 
-		//NET_DVR_SetDVRConfig(m_struDeviceInfo.lLoginID, NET_DVR_SET_CCDPARAMCFG, m_struDeviceInfo.iStartChan, &para, sizeof(NET_DVR_CAMERAPARAMCFG));
-	
-		
-	
 	}else{
 		str.brightness = 0; //standard h264
 		str.contrast = 0; //standard h264
@@ -631,38 +607,29 @@ PARAM_STRU HikController::getParamHik()
 		str.exposuretime = 1; //us
 
 		str.daynight = 0; 
-	
-	
+
+
 	}
 	return str;
 }
 
 
 /*************************************************
-函数名:    	logoutHik
-函数描述:	注册设备
-输入参数:   设备info
-输出参数:   			
-返回值:		SUCESS 成功
+Function:   logoutHik
+Desc:	    注册设备
+Input:      设备info
+Return:		SUCCESS 成功
             FAIL 失败
 **************************************************/
 int HikController::logoutHik()
 {
 	if(NET_DVR_Logout_V30(m_struDeviceInfo.lLoginID)){
-		return SUCESS;
+		return SUCCESS;
 
 	}else{
 		return FAIL;
 	} 
 }
-
-
-
-
-
-
-
-
 
 
 HikController::~HikController(void)

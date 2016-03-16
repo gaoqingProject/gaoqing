@@ -48,4 +48,6 @@ public:
 	CListBox output_list_;
 
 
+public:
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 };

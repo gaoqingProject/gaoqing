@@ -13,6 +13,7 @@
 #include "SerialPort.h"
 #include <direct.h>
 #include "common.h"
+#include "CMySliderCtrl.h"
 
 
 #define USED_PORT_A 90		//card decode port
@@ -71,8 +72,8 @@ public:
 	HTREEITEM m_hDevItem;
 	//function
 	BOOL DoLogin();
-	void DoGetDeviceResoureCfg();
-	void GetDecoderCfg();
+	//void DoGetDeviceResoureCfg();
+	//void GetDecoderCfg();
 	afx_msg void OnClose();
 	void StopPlay();
 	void StopRecord();
@@ -93,7 +94,7 @@ public:
 	CString getConfig(CString category,CString item,CString def);
 	static void setConfig(CString category,CString item,CString val);
 	bool playVideo(CString patha,CString pathb,CString pathc,CString pathd);
-	int stopVideo();
+	int stopVideo(bool isRec);
 	int pauseVideo();
 	int resumeVideo();
 	int fastVideo();
@@ -101,9 +102,9 @@ public:
 	int saveParams(BYTE bright,BYTE contrast,BYTE sharpness,BYTE saturation,int exp_mode,int exp_time,int daynight);
 	PARAM_STRU getParams();
 
-	DWORD getPlayedTime();
+	DWORD getPlayedTime(bool isRec);
 
-	DWORD getVideoTime();
+	DWORD getVideoTime(bool isRec);
 	int playVideoPos(DWORD pos);
 	CString getCStringFromConfig(CString cam,CString sub);
 	bool loginCamera();
@@ -133,6 +134,7 @@ public:
 	void restoreSize();
 
 	void ShowLivePlayBackState();
+	int playLive(bool display);
 
 
 
@@ -144,6 +146,8 @@ public:
 	CRect screenA,screenB,screenC,screenD,screenMax,screenProcess,screenPlay,screenFast,screenSlow;
 	CString path;
 	int playSpeed;
+	int slowtimes;
+	bool adjust;
 //==============================================
 private:
 
@@ -154,6 +158,7 @@ private:
 	CRecordset rs_train;//,rs_details;
 	int maxScreen;
 	bool maxScreen_isMax;
+	
 	
 // Implementation
 protected:
@@ -188,7 +193,7 @@ public:
 	afx_msg void OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult);
 
 public:
-	CSliderCtrl playslider;
+	CMySliderCtrl playslider;
 public:
 	afx_msg void OnNMReleasedcaptureSliderPlay(NMHDR *pNMHDR, LRESULT *pResult);
 public:
@@ -213,4 +218,6 @@ public:
 	afx_msg void OnStnDblclickStaticPlayD();
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+ 
+
 };

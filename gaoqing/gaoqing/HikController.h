@@ -4,7 +4,7 @@
 #include "common.h"
 
 #define FAIL -1
-#define SUCESS 0
+#define SUCCESS 0
 
 #define ERROR_FAIL_OPEN_FILE   1
 #define ERROR_FAIL_OPEN_WINDOW 2
@@ -12,59 +12,57 @@
 class HikController
 {
 public:
+//============================================ Member Functions ===================
 	HikController(void);
-	static void initHik(void);
-	CString ip;
-	UINT port;
-	CString name;
-	CString pwd;
-	LONG handle;
-	HWND wind;
-	LONG play_no;
-	BOOL g_bRefDone;
-	BOOL g_test;
+	~HikController(void);
 
-
-	bool displayHik();
-	void stopdisplayHik();
-	bool stopPlayHik();
-	bool saveFileHik(CString file);
-	bool stopsaveFileHik();
-	bool stopFileHik();
-	int loginHik();
-	int logoutHik();
+	//live functions
+	bool playliveHik(bool isPlay);
+	bool stopplayliveHik();
+	
+	bool savefileHik(CString file);
+	bool stopsavefileHik();
+	
+	
+	//replay fuctions
+	bool pauseHik();
+	bool resumeHik();
+	bool slowHik(int times);
+	bool fastHik();
 	int playbackHik(CString filename);
 	int stopplaybackHik();
+	int playposHik(DWORD pos);
 	DWORD playedtimeHik();
+	DWORD playtimeHik();
+
+	//login and setting functions
+	static void CALLBACK FileRefDoneCB(DWORD nPort,void* nUser);
+	static void initHik(void);
+
+	int loginHik();
+	int logoutHik();
 	int saveParamHik(BYTE bright,BYTE contrast,BYTE sharpness,BYTE saturation,int exp_mode,int exp_time,int daynight);
 	PARAM_STRU getParamHik();
 
-	void playslowHik();
-	int playposHik(DWORD pos);
-	DWORD playtimeHik();
-	static void CALLBACK FileRefDoneCB(DWORD nPort,void* nUser);
-	bool pauseHik();
-	bool resumeHik();
-	bool slowHik();
-	bool fastHik();
-	bool playHik();
 
+	bool rec;
+
+//============================================ Member Variables ===================
+	
+	HWND mWind;
+	LONG mPlay_no;
+	CString mIp;
+	UINT mPort;
+	CString mName;
+	CString mPwd;
 private:
+//============================================ Member Functions ===================
+	void dogetdeviceresourecfgHik(LOCAL_DEVICE_INFO *info,LONG channel);
+	void getdecodercfgHik(LOCAL_DEVICE_INFO *info);
+//============================================ Member Variables ===================
+	LONG handle;
+	BOOL g_bRefDone;
+	BOOL g_test;
+	CString file;
 	LOCAL_DEVICE_INFO m_struDeviceInfo;
-	void DoGetDeviceResoureCfg(LOCAL_DEVICE_INFO *info,LONG channel);
-	void GetDecoderCfg(LOCAL_DEVICE_INFO *info);
-
-	static void CALLBACK HikController::test(
-  long        nPort,
-  char        *pBuf,
-  long        nSize,
- FRAME_INFO  *pFrameInfo,
-  void*        nUser,
-  void*        nReserved2
- 
-  );
-	 CString file;
-
-public:
-	~HikController(void);
 };

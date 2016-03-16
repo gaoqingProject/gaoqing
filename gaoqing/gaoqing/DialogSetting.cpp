@@ -47,108 +47,143 @@ CDialogSetting::~CDialogSetting()
 BOOL CDialogSetting::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	CString str;
+	CString tempa,tempb;
 	int i;
-	for(i=1;i<=100;i++){
-		str.Format("%d",i);
-		c_Brightness.AddString(str);
-		str="";
-	}
-	for(i=1;i<=100;i++){
-		str.Format("%d",i);
-		c_Contrast.AddString(str);
-		str="";
-	}
-	for(i=1;i<=100;i++){
-		str.Format("%d",i);
-		c_Sharpness.AddString(str);
-		str="";
-	}
-	for(i=1;i<=100;i++){
-		str.Format("%d",i);
-		c_Saturation.AddString(str);
-		str="";
-	}
-
-	c_ExpMode.AddString(_T("自动"));
-	c_ExpMode.AddString(_T("手动"));
-
-
-	for(i=1;i<=100;i++){
-		str.Format("%d",i*100);
-		c_ExpTime.AddString(str);
-		str="";
-	}
 	
+	PARAM_STRU pm = getParams();
+
+	tempa.Format("%d",pm.brightness);
+	//str = getCStringFromConfig("CAMS","Brightness");
+	c_Brightness.SetWindowTextA(tempa);
+	for(i=1;i<=100;i++){
+		tempb.Format("%d",i);
+		c_Brightness.AddString(tempb);
+		if(tempa == tempb){
+			c_Brightness.SetCurSel(i);
+		}
+		tempb="";
+	}
+	setCStringToConfig("CAMS","Brightness",tempa);
+	tempa="";
+
+
+	tempa.Format("%d",pm.contrast);
+	//str = getCStringFromConfig("CAMS","Contrast");
+	c_Contrast.SetWindowTextA(tempa);
+	for(i=1;i<=100;i++){
+		tempb.Format("%d",i);
+		c_Contrast.AddString(tempb);
+		if(tempa == tempb){
+			c_Contrast.SetCurSel(i);
+		}
+		tempb="";
+	}
+	setCStringToConfig("CAMS","Contrast",tempa);
+	tempa="";
+
+	tempa.Format("%d",pm.sharpness);
+	//str = getCStringFromConfig("CAMS","Sharpness");
+	c_Sharpness.SetWindowTextA(tempa);
+	for(i=1;i<=100;i++){
+		tempb.Format("%d",i);
+		c_Sharpness.AddString(tempb);
+		if(tempa == tempb){
+			c_Sharpness.SetCurSel(i);
+		}
+		tempb="";
+	}
+	setCStringToConfig("CAMS","Sharpness",tempa);
+	tempa="";
+
+	tempa.Format("%d",pm.saturation);
+	//str = getCStringFromConfig("CAMS","Saturation");
+	c_Saturation.SetWindowTextA(tempa);
+	for(i=1;i<=100;i++){
+		tempb.Format("%d",i);
+		c_Saturation.AddString(tempb);
+		if(tempa == tempb){
+			c_Saturation.SetCurSel(i);
+		}
+		tempb="";
+	}
+	setCStringToConfig("CAMS","Saturation",tempa);
+	tempa="";
+
+	//str.Format("%d",pm.exposuremode);
+
+	if(pm.exposuremode ==0){
+		tempa = "手动曝光";
+	}else{
+		tempa = "自动曝光";
+	}
+
+	//str = getCStringFromConfig("CAMS","ExposureMode");
+	c_ExpMode.SetWindowTextA(tempa);
+
+	c_ExpMode.AddString(_T("自动曝光"));
+	c_ExpMode.AddString(_T("手动曝光"));
+
+	if(tempa == _T("自动曝光")){
+			c_ExpMode.SetCurSel(0);
+	}else if(tempa == _T("手动曝光")){
+			c_ExpMode.SetCurSel(1);
+	}
+
+	setCStringToConfig("CAMS","ExposureMode",tempa);
+	tempa="";
+
+	tempa.Format("%d",pm.exposuretime);
+	//str = getCStringFromConfig("CAMS","ExposureTime");
+	c_ExpTime.SetWindowTextA(tempa);
+	for(i=1;i<=100;i++){
+		tempb.Format("%d",i*100);
+		c_ExpTime.AddString(tempb);
+		if(tempa == tempb){
+			c_ExpTime.SetCurSel(i);
+		}
+		tempb="";
+	}
+	setCStringToConfig("CAMS","ExposureTime",tempa);
+	tempa="";
+
+	
+	if(pm.daynight ==0){
+		tempa = "白天";
+	}else if(pm.daynight ==1){
+		tempa = "夜晚";
+	}else if(pm.daynight ==2){
+		tempa = "自动";
+	}else if(pm.daynight ==3){
+		tempa = "定时";
+	}else if(pm.daynight ==4){
+		tempa = "报警输入触发";
+	}
+
+	//str.Format("%d",pm.daynight);
+	//str = getCStringFromConfig("CAMS","DayNight");
+	c_DayNight.SetWindowTextA(tempa);
+
 	c_DayNight.AddString(_T("白天"));
 	c_DayNight.AddString(_T("夜晚"));
 	c_DayNight.AddString(_T("自动"));
 	c_DayNight.AddString(_T("定时"));
 	c_DayNight.AddString(_T("报警输入触发"));
 
-	PARAM_STRU pm = getParams();
-
-	str.Format("%d",pm.brightness);
-	//str = getCStringFromConfig("CAMS","Brightness");
-	c_Brightness.SetWindowTextA(str);
-	setCStringToConfig("CAMS","Brightness",str);
-	str="";
-
-	str.Format("%d",pm.contrast);
-	//str = getCStringFromConfig("CAMS","Contrast");
-	c_Contrast.SetWindowTextA(str);
-	setCStringToConfig("CAMS","Contrast",str);
-	str="";
-
-	str.Format("%d",pm.sharpness);
-	//str = getCStringFromConfig("CAMS","Sharpness");
-	c_Sharpness.SetWindowTextA(str);
-	setCStringToConfig("CAMS","Sharpness",str);
-	str="";
-
-	str.Format("%d",pm.saturation);
-	//str = getCStringFromConfig("CAMS","Saturation");
-	c_Saturation.SetWindowTextA(str);
-	setCStringToConfig("CAMS","Saturation",str);
-	str="";
-
-	str.Format("%d",pm.exposuremode);
-
-	if(pm.exposuremode ==0){
-		str = "手动曝光";
-	}else{
-		str = "自动曝光";
+	if(tempa == _T("白天")){
+			c_DayNight.SetCurSel(0);
+	}else if(tempa == _T("夜晚")){
+			c_DayNight.SetCurSel(1);
+	}else if(tempa == _T("自动")){
+			c_DayNight.SetCurSel(2);
+	}else if(tempa == _T("定时")){
+			c_DayNight.SetCurSel(3);
+	}else if(tempa == _T("报警输入触发")){
+			c_DayNight.SetCurSel(4);
 	}
 
-	//str = getCStringFromConfig("CAMS","ExposureMode");
-	c_ExpMode.SetWindowTextA(str);
-	setCStringToConfig("CAMS","ExposureMode",str);
-	str="";
 
-	str.Format("%d",pm.exposuretime);
-	//str = getCStringFromConfig("CAMS","ExposureTime");
-	c_ExpTime.SetWindowTextA(str);
-	setCStringToConfig("CAMS","ExposureTime",str);
-	str="";
-
-	
-	if(pm.daynight ==0){
-		str = "白天";
-	}else if(pm.daynight ==1){
-		str = "夜晚";
-	}else if(pm.daynight ==2){
-		str = "自动";
-	}else if(pm.daynight ==3){
-		str = "定时";
-	}else if(pm.daynight ==4){
-		str = "报警输入触发";
-	}
-
-	//str.Format("%d",pm.daynight);
-	//str = getCStringFromConfig("CAMS","DayNight");
-	c_DayNight.SetWindowTextA(str);
-	setCStringToConfig("CAMS","DayNight",str);
-	str="";
+	setCStringToConfig("CAMS","DayNight",tempa);
+	tempa="";
 
 
 	initParam();
@@ -245,6 +280,8 @@ BEGIN_MESSAGE_MAP(CDialogSetting, CDialog)
 	ON_EN_CHANGE(IDC_EDIT_USER_D, &CDialogSetting::OnEnChangeEditUserD)
 	ON_EN_CHANGE(IDC_EDIT_PWD_D, &CDialogSetting::OnEnChangeEditPwdD)
 	ON_BN_CLICKED(IDC_BUTTON_LOGIN, &CDialogSetting::OnBnClickedButtonLogin)
+	ON_WM_VSCROLL()
+	ON_WM_MOUSEWHEEL()
 END_MESSAGE_MAP()
 vector<CString> CDialogSetting::SplitCString(CString strSource, CString ch)
 {
@@ -826,4 +863,106 @@ void CDialogSetting::Logout()
 
 
 		loginSet.SetWindowTextA(_T("登录"));
+}
+
+void CDialogSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
+
+
+
+
+
+	SCROLLINFO scrollinfo;
+	GetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+	switch (nSBCode)
+	{
+	case SB_BOTTOM:
+		ScrollWindow(0,(scrollinfo.nPos-scrollinfo.nMax)*10);
+		scrollinfo.nPos = scrollinfo.nMax;
+		SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+		break;
+	case SB_TOP:
+		ScrollWindow(0,(scrollinfo.nPos-scrollinfo.nMin)*10);
+		scrollinfo.nPos = scrollinfo.nMin;
+		SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+		break;
+	case SB_LINEUP:
+		scrollinfo.nPos -= 20;
+		if (scrollinfo.nPos<scrollinfo.nMin)
+		{
+			scrollinfo.nPos = scrollinfo.nMin;
+			break;
+		}
+		SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+		ScrollWindow(0,15);
+		break;
+	case SB_LINEDOWN:
+		scrollinfo.nPos += 20;
+		if (scrollinfo.nPos>scrollinfo.nMax)
+		{
+			scrollinfo.nPos = scrollinfo.nMax;
+			break;
+		}
+		SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+		ScrollWindow(0,-15);
+		break;
+	case SB_PAGEUP:
+		scrollinfo.nPos -= 50;
+		if (scrollinfo.nPos<scrollinfo.nMin)
+		{
+			scrollinfo.nPos = scrollinfo.nMin;
+			SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+			break;
+		}
+		SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+		ScrollWindow(0,10*5);
+		break;
+	case SB_PAGEDOWN:
+		scrollinfo.nPos += 50;
+		if (scrollinfo.nPos>scrollinfo.nMax)
+		{
+			scrollinfo.nPos = scrollinfo.nMax;
+			SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+			break;
+		}
+		SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+		ScrollWindow(0,-10*5);
+		break;
+	case SB_ENDSCROLL:
+		// MessageBox("SB_ENDSCROLL");
+		break;
+	case SB_THUMBPOSITION:
+		// ScrollWindow(0,(scrollinfo.nPos-nPos)*10);
+		// scrollinfo.nPos = nPos;
+		// SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+		break;
+	case SB_THUMBTRACK:
+		ScrollWindow(0,(scrollinfo.nPos-nPos));
+		scrollinfo.nPos = nPos;
+		SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+		break;
+	}
+
+
+}
+
+BOOL CDialogSetting::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	// TODO: Add your message handler code here and/or call default
+
+
+	if(zDelta < 0)
+	{
+		OnVScroll(SB_LINEDOWN, GetScrollPos(SB_VERT),  GetScrollBarCtrl(SB_VERT));
+	}
+	else if (zDelta > 0)
+	{
+		OnVScroll(SB_LINEUP, GetScrollPos(SB_VERT),  GetScrollBarCtrl(SB_VERT));
+	}
+
+
+	return CDialog::OnMouseWheel(nFlags, zDelta, pt);
 }

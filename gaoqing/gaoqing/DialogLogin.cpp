@@ -46,6 +46,7 @@ BOOL CDialogLogin::OnInitDialog()
 BEGIN_MESSAGE_MAP(CDialogLogin, CDialog)
 	
 	
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 // CDialogLogin message handlers
@@ -63,7 +64,7 @@ void CDialogLogin::OnPlayClicked()
 {
 
 	
-	if(mHik->playbackHik("test.mp4")==SUCESS){
+	if(mHik->playbackHik("test.mp4")==SUCCESS){
 	}
 }*/
 /*
@@ -83,9 +84,9 @@ void CDialogLogin::OnLoginClicked()
 /*
 void CDialogLogin::OnLogoutClicked()
 {
-	if(mHik->stopFileHik()==SUCESS){
+	if(mHik->stopFileHik()==SUCCESS){
 		m_bIsRecording = FALSE;
-		if(mHik->stopPlayHik()==SUCESS){
+		if(mHik->stopplayliveHik()==SUCCESS){
 
 		}
 		mHik->logoutHik();
@@ -114,3 +115,19 @@ void CDialogLogin::OnLogoutClicked()
 	
 }*/
 
+
+void CDialogLogin::OnSize(UINT nType, int cx, int cy)
+{
+	CDialog::OnSize(nType, cx, cy);
+	CWnd *pWnd; 
+	pWnd = GetDlgItem(IDC_LIST1);
+	if(pWnd != NULL){
+		CRect new_rect;
+		new_rect.left=10;//调整控件大小  
+		new_rect.right=cx-10;  
+		new_rect.top=0;  
+		new_rect.bottom=cy;  
+		pWnd->MoveWindow(new_rect);//设置控件大小  
+	}
+	// TODO: Add your message handler code here
+}

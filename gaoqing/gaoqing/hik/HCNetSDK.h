@@ -12,7 +12,7 @@ typedef struct __PLAYRECT
 }PLAYRECT;
 #endif
 
-#if (defined(_WIN32)) //windows
+#if (defined(_WIN32)) //mWindows
 #define NET_DVR_API  extern "C"__declspec(dllimport)
 typedef  unsigned __int64 UINT64;
 typedef  signed __int64 INT64;
@@ -64,7 +64,7 @@ typedef void* HWND;
 typedef struct __DC
 {
     void*   surface;        //SDL Surface
-    HWND    hWnd;           // HDC window handle
+    HWND    hWnd;           // HDC mWindow handle
 }DC;
 typedef DC* HDC;
 #else
@@ -24627,7 +24627,7 @@ typedef struct tagNET_DVR_GET_GPS_DATA_PAPAM
 typedef struct tagNET_DVR_SDKLOCAL_CFG
 {
     BYTE	byEnableAbilityParse;	//使用能力集解析库,0-不使用,1-使用,默认不使用
-    BYTE    byVoiceComMode;          //对讲模式，0-使用对讲库（默认），1-使用windows api模式	
+    BYTE    byVoiceComMode;          //对讲模式，0-使用对讲库（默认），1-使用mWindows api模式	
     BYTE    byLoginWithSimXml;  //登录时使用模拟能力,0-不使用,1-使用,默认不使用
     BYTE    byCompatibleType;
     BYTE    byRes[380];
@@ -24642,7 +24642,7 @@ typedef struct tagNET_DVR_LOCAL_ABILITY_PARSE_CFG
 
 typedef struct tagNET_DVR_LOCAL_TALK_MODE_CFG
 {
-    BYTE	byTalkMode;				//对讲模式，0-使用对讲库（默认），1-使用windows api模式
+    BYTE	byTalkMode;				//对讲模式，0-使用对讲库（默认），1-使用mWindows api模式
     BYTE	byRes[127];				
 }NET_DVR_LOCAL_TALK_MODE_CFG, *LPNET_DVR_LOCAL_TALK_MODE_CFG;
 

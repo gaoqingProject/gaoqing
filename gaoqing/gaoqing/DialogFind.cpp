@@ -452,6 +452,7 @@ BEGIN_MESSAGE_MAP(CDialogFind, CDialog)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BUTTON_FIND, &CDialogFind::OnBnClickedButtonFind)
 	ON_NOTIFY(NM_DBLCLK, IDC_TRAIN_LIST, &CDialogFind::OnNMDblclkTrainList)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -463,44 +464,6 @@ void CDialogFind::OnTvnSelchangedTrainList(NMHDR *pNMHDR, LRESULT *pResult)
 	// TODO: Add your control notification handler code here
 	*pResult = 0;
 
-/*
-	
-	//CString *strText; // 树节点的标签文本字符串   
-       
-    // 获取当前选中节点的句柄   
-    HTREEITEM hItem = tran_list.GetSelectedItem();   
-    // 获取选中节点的标签文本字符串   
-    //strText = (CString *)tran_list.GetItemData(hItem);   
-    // 将字符串显示到编辑框中   
-    //SetDlgItemText(IDC_ITEM_SEL_EDIT, strText); 
-
-	DWORD_PTR pt = tran_list.GetItemData(hItem);
-	if(pt != 0){
-		CAR_PLAY *item = (CAR_PLAY *)tran_list.GetItemData(hItem); 
-	
-	//CgaoqingDlg *dlg = (CgaoqingDlg *)GetParent()->GetParent();
-
-		//CString *st = item->path;
-	//CDialog *gg = (CDialog *)dlg;
-		parent->playVideo(item->patha==NULL?"":(*(item->patha)),item->pathb==NULL?"":(*(item->pathb)),item->pathc==NULL?"":(*(item->pathc)),item->pathd==NULL?"":(*(item->pathd)));
-
-
-		len =	parent->getVideoTime()*1000;
-
-		parent->playslider.SetRange(0,len);
-		parent->playslider.SetPos(item->time);
-
-		parent->playVideoPos(item->time);
-
-		parent->s_Play=TRUE;
-		parent->GetDlgItem(IDC_SLIDER_PLAY)->EnableWindow(true);
-		parent->GetDlgItem(IDC_BUTTON_REC_PLAY)->EnableWindow(true);
-		parent->GetDlgItem(IDC_BUTTON_REC_FAST)->EnableWindow(true);
-		parent->GetDlgItem(IDC_BUTTON_REC_SLOW)->EnableWindow(true);
-		parent->GetDlgItem(IDC_BUTTON_REC_PLAY)->SetWindowText("暂停");
-
-		SetTimer(PLAY_TIMER,500,NULL);
-	}*/
 
 }
 
@@ -540,13 +503,14 @@ NMTVGETINFOTIP* pTVTipInfo = (NMTVGETINFOTIP*)pNMHDR;   // 将传入的pNMHDR转换为N
 
 void CDialogFind::ShowPlayBackState()
 {
-	//DWORD totaltime = dlg->getVideoTime();
 	if (len == 0)
 	{
 		return;
 	}
+	if(parent->adjust)
+		return;
 
-	DWORD nCurTime=parent->getPlayedTime();
+	DWORD nCurTime=parent->getPlayedTime(true);
 	parent->playslider.SetPos(nCurTime);
 	/*CString csStatus;
 	csStatus.Format("%02d:%02d:%02d/%02d:%02d:%02d",\
@@ -557,7 +521,7 @@ void CDialogFind::ShowPlayBackState()
 	*/
 	if (nCurTime > len-100)
 	{
-		parent->stopVideo();
+		parent->stopVideo(true);
 		CStatic *wd = (CStatic *)parent->GetDlgItem(IDC_STATIC_PLAY_A);
 		wd->SetBitmap(NULL);
 		wd = (CStatic *)parent->GetDlgItem(IDC_STATIC_PLAY_B);
@@ -647,7 +611,7 @@ void CDialogFind::OnNMDblclkTrainList(NMHDR *pNMHDR, LRESULT *pResult)
 		parent->playVideo(item->patha==NULL?"":(*(item->patha)),item->pathb==NULL?"":(*(item->pathb)),item->pathc==NULL?"":(*(item->pathc)),item->pathd==NULL?"":(*(item->pathd)));
 
 
-		len =	parent->getVideoTime()*1000;
+		len =	parent->getVideoTime(true)*1000;
 
 		parent->playslider.SetRange(0,len);
 		parent->playslider.SetPos(item->time);
@@ -662,5 +626,97 @@ void CDialogFind::OnNMDblclkTrainList(NMHDR *pNMHDR, LRESULT *pResult)
 		parent->GetDlgItem(IDC_BUTTON_REC_PLAY)->SetWindowText("暂停");
 
 		SetTimer(PLAY_TIMER,500,NULL);
+	}
+}
+
+void CDialogFind::OnSize(UINT nType, int cx, int cy)
+{
+	CDialog::OnSize(nType, cx, cy);
+
+	int gap = 10;
+	int wtitle = (cx-gap-gap-gap-gap)/4;
+	int htitle = 25;
+
+	int wsel = (cx-gap-gap-gap-gap)*2/4;
+	int hsel = htitle;
+
+	int wbtn = (cx-gap-gap-gap-gap)/4;
+	int hbtn = htitle+gap+htitle+gap+htitle;
+
+	int wtre = cx-gap-gap;
+	int htre = cy-gap-gap-gap-gap-gap-htitle*3;
+
+	CWnd *pWnd; 
+	CRect new_rect;
+	pWnd = GetDlgItem(IDC_STATIC1);
+	if(pWnd != NULL){
+		new_rect.left=gap;//调整控件大小  
+		new_rect.right=new_rect.left+wtitle;  
+		new_rect.top=gap;  
+		new_rect.bottom=new_rect.top+htitle;  
+		pWnd->MoveWindow(new_rect);//设置控件大小  
+	}
+
+	pWnd = GetDlgItem(IDC_EDIT1);
+	if(pWnd != NULL){
+		new_rect.left=new_rect.right+gap;//调整控件大小  
+		new_rect.right=new_rect.left+wsel;  
+		//new_rect.top=gap;  
+		//new_rect.bottom=new_rect.top+htitle;  
+		pWnd->MoveWindow(new_rect);//设置控件大小  
+	}
+
+	pWnd = GetDlgItem(IDC_STATIC2);
+	if(pWnd != NULL){
+		new_rect.left=gap;//调整控件大小  
+		new_rect.right=new_rect.left+wtitle;  
+		new_rect.top=new_rect.bottom+gap;  
+		new_rect.bottom=new_rect.top+htitle;  
+		pWnd->MoveWindow(new_rect);//设置控件大小  
+	}
+
+	pWnd = GetDlgItem(IDC_DATETIME_START);
+	if(pWnd != NULL){
+		new_rect.left=new_rect.right+gap;//调整控件大小  
+		new_rect.right=new_rect.left+wsel;  
+		//new_rect.top=gap;  
+		//new_rect.bottom=new_rect.top+htitle;  
+		pWnd->MoveWindow(new_rect);//设置控件大小  
+	}
+
+	pWnd = GetDlgItem(IDC_STATIC3);
+	if(pWnd != NULL){
+		new_rect.left=gap;//调整控件大小  
+		new_rect.right=new_rect.left+wtitle;  
+		new_rect.top=new_rect.bottom+gap;  
+		new_rect.bottom=new_rect.top+htitle;  
+		pWnd->MoveWindow(new_rect);//设置控件大小  
+	}
+
+	pWnd = GetDlgItem(IDC_DATETIME_END);
+	if(pWnd != NULL){
+		new_rect.left=new_rect.right+gap;//调整控件大小  
+		new_rect.right=new_rect.left+wsel;  
+		//new_rect.top=gap;  
+		//new_rect.bottom=new_rect.top+htitle;  
+		pWnd->MoveWindow(new_rect);//设置控件大小  
+	}
+
+	pWnd = GetDlgItem(IDC_BUTTON_FIND);
+	if(pWnd != NULL){
+		new_rect.left=new_rect.right+gap;//调整控件大小  
+		new_rect.right=new_rect.left+wbtn;  
+		new_rect.top=gap;  
+		new_rect.bottom=new_rect.top+hbtn;  
+		pWnd->MoveWindow(new_rect);//设置控件大小  
+	}
+	
+	pWnd = GetDlgItem(IDC_TRAIN_LIST);
+	if(pWnd != NULL){
+		new_rect.left=gap;//调整控件大小  
+		new_rect.right=new_rect.left+wtre;  
+		new_rect.top=gap*4 + htitle*3;  
+		new_rect.bottom=new_rect.top+htre;  
+		pWnd->MoveWindow(new_rect);//设置控件大小  
 	}
 }

@@ -65,4 +65,6 @@ public:
 	CEdit mEditCarNo;
 public:
 	afx_msg void OnNMDblclkTrainList(NMHDR *pNMHDR, LRESULT *pResult);
+public:
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 };

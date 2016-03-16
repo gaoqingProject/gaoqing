@@ -24,6 +24,7 @@ CgaoqingDlg::CgaoqingDlg(CWnd* pParent /*=NULL*/)
 	,maxScreen_isMax(false)
 	,playSpeed(0)
 	,is_minimized(false)
+	,adjust(false)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
@@ -53,6 +54,7 @@ BEGIN_MESSAGE_MAP(CgaoqingDlg, CDialog)
 	ON_STN_DBLCLK(IDC_STATIC_PLAY_C, &CgaoqingDlg::OnStnDblclickStaticPlayC)
 	ON_STN_DBLCLK(IDC_STATIC_PLAY_D, &CgaoqingDlg::OnStnDblclickStaticPlayD)
 	ON_WM_TIMER()
+
 END_MESSAGE_MAP()
 
 
@@ -90,7 +92,7 @@ void CgaoqingDlg::OnPaint()
 }
 
 // The system calls this function to obtain the cursor to display while the user drags
-//  the minimized window.
+//  the minimized mWindow.
 HCURSOR CgaoqingDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -114,28 +116,179 @@ void CgaoqingDlg::initView()
 
 	CRect rs;
 	tabSettings.GetClientRect(&rs);
-	rs.left +=10;
-	rs.right -=10;
+	//rs.left +=10;
+	//rs.right -=10;
 	rs.top +=30;
 	rs.bottom -=30;
+
+
+
+	playslider.sign = &adjust;
+	playslider.SetPageSize(20);
+	
+
 	dLogin.MoveWindow(&rs);
 	dFind.MoveWindow(&rs);
 	dSetting.MoveWindow(&rs);
+
+	
 
 	dLogin.ShowWindow(true);
 	dFind.ShowWindow(false);
 	dSetting.ShowWindow(false);
 	tabSettings.SetCurSel(0);
 
+
+	
+
 }
 BOOL CgaoqingDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	int cx;// = GetSystemMetrics(SM_CXFULLSCREEN); 
+	int cy;// = GetSystemMetrics(SM_CYFULLSCREEN); 
+	CRect rt;
+
+	SystemParametersInfo(SPI_GETWORKAREA,0,&rt,0);
+	cx = rt.right;
+	cy = rt.bottom;
+	SetWindowPos(NULL,0,0,cx,cy,SWP_NOMOVE); 
+
+	
+	GetWindowRect(&rt);  
+	ScreenToClient(&rt);
+	cx = rt.right;
+	cy = rt.bottom;
+
+	int gap = 20;
+
+	int wtab = 300;
+	int htab = cy;
+
+	int wsld = (cx-wtab);
+	int hsld = 40;
+
+	int wbtn = (cx-wtab-gap-gap-gap-gap)/3;
+	int hbtn = 50;
+
+	int wdis = (cx-wtab)/2;
+	int hdis = (cy-gap-hsld-gap-hbtn-gap)/2;
+
+
+	
+
+	
+
+	
+
+	
+
+
+
+
+
+
+
+	CRect new_rect;   //获取控件变化前的大小  
+		//old_rect = getSize(pWnd);
+		//pWnd->GetWindowRect(&old_rect);  
+		//ScreenToClient(&old_rect);//将控件大小转换为在对话框中的区域坐标   
+		//rect.left=rect.left*cx/m_rect.Width();//调整控件大小  
+		//rect.right=rect.right*cx/m_rect.Width();  
+		//rect.top=rect.top*cy/m_rect.Height();  
+		//rect.bottom=rect.bottom*cy/m_rect.Height();  
+		
+
+
+
+	CWnd *pWnd; 
+	
+	//GetDlgItem(IDC_SLIDER_PLAY)->GetWindowRect(&new_rect);
+	pWnd = GetDlgItem(IDC_TAB);
+	new_rect.left=wdis*2;//调整控件大小  
+	new_rect.right=cx;  
+	new_rect.top=0;  
+	new_rect.bottom=htab;  
+	pWnd->MoveWindow(new_rect);//设置控件大小  
+
+
+	pWnd = GetDlgItem(IDC_STATIC_PLAY_A); 
+	new_rect.left=0;//调整控件大小  
+	new_rect.right=wdis;  
+	new_rect.top=0;  
+	new_rect.bottom=hdis;  
+	pWnd->MoveWindow(new_rect);//设置控件大小  
+
+
+	pWnd = GetDlgItem(IDC_STATIC_PLAY_B); 
+	new_rect.left=wdis;//调整控件大小  
+	new_rect.right=wdis*2;  
+	new_rect.top=0;  
+	new_rect.bottom=hdis;  
+	pWnd->MoveWindow(new_rect);//设置控件大小  
+
+
+	pWnd = GetDlgItem(IDC_STATIC_PLAY_C); 
+	new_rect.left=0;//调整控件大小  
+	new_rect.right=wdis;  
+	new_rect.top=hdis;  
+	new_rect.bottom=hdis*2;  
+	pWnd->MoveWindow(new_rect);//设置控件大小  
+
+
+	pWnd = GetDlgItem(IDC_STATIC_PLAY_D); 
+	new_rect.left=wdis;//调整控件大小  
+	new_rect.right=wdis*2;  
+	new_rect.top=hdis;  
+	new_rect.bottom=hdis*2;  
+	pWnd->MoveWindow(new_rect);//设置控件大小  
+
+
+	
+
+
+
+
+	pWnd = GetDlgItem(IDC_SLIDER_PLAY);
+	new_rect.left=0;//调整控件大小  
+	new_rect.right=wsld;  
+	new_rect.top=new_rect.bottom+gap;  
+	new_rect.bottom=new_rect.top+hsld;  
+	pWnd->MoveWindow(new_rect);//设置控件大小  
+
+
+
+	pWnd = GetDlgItem(IDC_BUTTON_REC_PLAY);
+	new_rect.left=gap;//调整控件大小  
+	new_rect.right=gap+wbtn;  
+	new_rect.top=new_rect.bottom+gap;  
+	new_rect.bottom=new_rect.top+hbtn;  
+	pWnd->MoveWindow(new_rect);//设置控件大小  
+
+
+	pWnd = GetDlgItem(IDC_BUTTON_REC_FAST);
+	new_rect.left=new_rect.right+gap;//调整控件大小  
+	new_rect.right=new_rect.left+wbtn;  
+	//new_rect.top=hdis*2+gap;  
+	//new_rect.bottom=hdis*2+gap+hsld;  
+	pWnd->MoveWindow(new_rect);//设置控件大小  
+
+	pWnd = GetDlgItem(IDC_BUTTON_REC_SLOW);
+	new_rect.left=new_rect.right+gap;//调整控件大小  
+	new_rect.right=new_rect.left+wbtn;  
+	//new_rect.top=hdis*2+gap;  
+	//new_rect.bottom=hdis*2+gap+hsld;  
+	pWnd->MoveWindow(new_rect);//设置控件大小  
+
+
+
+
+
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	NET_DVR_Init();
+	HikController::initHik();
 	// TODO: Add extra initialization here
 	initParam();
 	
@@ -186,7 +339,11 @@ void CgaoqingDlg::initParam()
 	camer_c = atoi(getConfig("CAMC","Enable","1"));
 	camer_d = atoi(getConfig("CAMD","Enable","1"));
 
+	
+
+
 	path = getConfig("CONFIG","PATH",".\\");
+	slowtimes = atoi(getConfig("CONFIG","SlowTimes","1"));
 	/*
 	ser_com = new CSerialPort;
 	ser_com->InitPort(Port_N, Port_BAUD, Port_PARITY , Port_DBITS, Port_STOP, EV_RXCHAR);
@@ -195,55 +352,55 @@ void CgaoqingDlg::initParam()
 	ser_com->pWnd = this;*/
 
 	LONG nPort;
-	if(camer_a){
+	//if(camer_a){
 
 		mHik_a = new HikController();
-		mHik_a->wind = GetDlgItem(IDC_STATIC_PLAY_A)->m_hWnd;
+		mHik_a->mWind = GetDlgItem(IDC_STATIC_PLAY_A)->m_hWnd;
 		PlayM4_GetPort(&nPort);
-		mHik_a->play_no = nPort;
-	} 
-	if(camer_b){
+		mHik_a->mPlay_no = nPort;
+	//} 
+	//if(camer_b){
 
 		mHik_b = new HikController();
-		mHik_b->wind = GetDlgItem(IDC_STATIC_PLAY_B)->m_hWnd;
+		mHik_b->mWind = GetDlgItem(IDC_STATIC_PLAY_B)->m_hWnd;
 		PlayM4_GetPort(&nPort);
-		mHik_b->play_no = nPort;
-	} 
-	if(camer_c){
+		mHik_b->mPlay_no = nPort;
+	//} 
+	//if(camer_c){
 
 		mHik_c = new HikController();
-		mHik_c->wind = GetDlgItem(IDC_STATIC_PLAY_C)->m_hWnd;
+		mHik_c->mWind = GetDlgItem(IDC_STATIC_PLAY_C)->m_hWnd;
 		PlayM4_GetPort(&nPort);
-		mHik_c->play_no = nPort;
-	} 
-	if(camer_d){
+		mHik_c->mPlay_no = nPort;
+	//} 
+	//if(camer_d){
 
 		mHik_d = new HikController();
-		mHik_d->wind = GetDlgItem(IDC_STATIC_PLAY_D)->m_hWnd;
+		mHik_d->mWind = GetDlgItem(IDC_STATIC_PLAY_D)->m_hWnd;
 		PlayM4_GetPort(&nPort);
-		mHik_d->play_no = nPort;
-	} 
+		mHik_d->mPlay_no = nPort;
+	//} 
 	/*
-	mHik_b->wind = GetDlgItem(IDC_STATIC_PLAY_B)->m_hWnd;
-	mHik_c->wind = GetDlgItem(IDC_STATIC_PLAY_C)->m_hWnd;
-	mHik_d->wind = GetDlgItem(IDC_STATIC_PLAY_D)->m_hWnd;
+	mHik_b->mWind = GetDlgItem(IDC_STATIC_PLAY_B)->m_hWnd;
+	mHik_c->mWind = GetDlgItem(IDC_STATIC_PLAY_C)->m_hWnd;
+	mHik_d->mWind = GetDlgItem(IDC_STATIC_PLAY_D)->m_hWnd;
 
 	
 	
 	PlayM4_GetPort(&nPort);
-	mHik_b->play_no = nPort;
+	mHik_b->mPlay_no = nPort;
 	PlayM4_GetPort(&nPort);
-	mHik_c->play_no = nPort;
+	mHik_c->mPlay_no = nPort;
 	PlayM4_GetPort(&nPort);
-	mHik_d->play_no = nPort;
+	mHik_d->mPlay_no = nPort;
 
 */
 	TRY   
 	{      
 		//		m_db.OpenEx(_T("DSN = gaoqingtest;UID = sa;PWD =gaoqing1"),CDatabase::noOdbcDialog);//连接到一个名为Test的数据源   
-		//m_db.OpenEx(_T("Driver={SQL Server};Server=mySQLServer;UID=sa; PWD=myPassword;Database=Northwind;"); 
+		//m_db.OpenEx(_T("Driver={SQL Server};Server=mySQLServer;UID=sa; PWD=myPassword;Database=NorthmWind;"); 
 		m_db.OpenEx(_T("DSN=gaoqing;UID=sa;PWD=gaoqing;"),CDatabase::noOdbcDialog);//连接到一个名为Test的数据源   
-		//m_db.OpenEx(_T("Driver={SQL Server};Server=mySQLServer;UID=sa; PWD=myPassword;Database=Northwind;"); 
+		//m_db.OpenEx(_T("Driver={SQL Server};Server=mySQLServer;UID=sa; PWD=myPassword;Database=NorthmWind;"); 
 		//m_db.OpenEx(_T("DSN=gaoqing;"),CDatabase::noOdbcDialog);//连接到一个名为Test的数据源   
 		rs_train.m_pDatabase = &m_db;   
 		//rs_details.m_pDatabase = &m_db;  
@@ -408,19 +565,21 @@ void CgaoqingDlg::Command_Disposal_Ser(char command)
 		else direction = 1;
 		dLogin.output_list_.ResetContent();
 		post_message(_T("列车到达...\r\n"));
+/*
 
-		if(camer_a && mHik_a->displayHik() != FAIL){
-
-		}
-		if(camer_b && mHik_b->displayHik() != FAIL){
+		if(camer_a && mHik_a->playliveHik(false) != FAIL){
 
 		}
-		if(camer_c && mHik_c->displayHik() != FAIL){
+		if(camer_b && mHik_b->playliveHik(false) != FAIL){
 
 		}
-		if(camer_d && mHik_d->displayHik() != FAIL){
+		if(camer_c && mHik_c->playliveHik(false) != FAIL){
 
 		}
+		if(camer_d && mHik_d->playliveHik(false) != FAIL){
+
+		}*/
+		playLive(false);
 
 		stime = timeGetTime();
 
@@ -435,7 +594,7 @@ void CgaoqingDlg::Command_Disposal_Ser(char command)
 		GetDlgItem(IDC_BUTTON_REC_FAST)->EnableWindow(false);
 		GetDlgItem(IDC_BUTTON_REC_SLOW)->EnableWindow(false);
 
-		if (stopVideo())
+		if (stopVideo(true))
 		{
 			
 		}
@@ -517,19 +676,19 @@ void CgaoqingDlg::Command_Disposal_Ser(char command)
 
 			}
 
-			if(camer_a && mHik_a->saveFileHik(foldername+"\\"+timename+"lt.mp4")==SUCESS){
+			if(camer_a && mHik_a->savefileHik(foldername+"\\"+timename+"lt.mp4")==SUCCESS){
 
 
 			}	
-			if(camer_b && mHik_b->saveFileHik(foldername+"\\"+timename+"rt.mp4")==SUCESS){
+			if(camer_b && mHik_b->savefileHik(foldername+"\\"+timename+"rt.mp4")==SUCCESS){
 
 
 			}
-			if(camer_c && mHik_c->saveFileHik(foldername+"\\"+timename+"lb.mp4")==SUCESS){
+			if(camer_c && mHik_c->savefileHik(foldername+"\\"+timename+"lb.mp4")==SUCCESS){
 
 
 			}
-			if(camer_d && mHik_d->saveFileHik(foldername+"\\"+timename+"rb.mp4")==SUCESS){
+			if(camer_d && mHik_d->savefileHik(foldername+"\\"+timename+"rb.mp4")==SUCCESS){
 
 
 			}
@@ -563,26 +722,28 @@ void CgaoqingDlg::Command_Disposal_Ser(char command)
 
 				if(car_n == 5) {
 					int re=0;
-					if(camer_a && mHik_a->playbackHik(foldername+"\\"+timename+"lt.mp4")==SUCESS){
 
-						mHik_a->playslowHik();
-						re=1;
-					}
-					if(camer_b && mHik_b->playbackHik(foldername+"\\"+timename+"rt.mp4")==SUCESS){
+					if(camer_a && mHik_a->playbackHik(foldername+"\\"+timename+"lt.mp4")==SUCCESS){
 
-						mHik_b->playslowHik();
-						re=1;
+						if(camer_a && mHik_a->slowHik(slowtimes)==SUCCESS)
+							re=1;
 					}
-					if(camer_c && mHik_c->playbackHik(foldername+"\\"+timename+"lb.mp4")==SUCESS){
+					if(camer_b && mHik_b->playbackHik(foldername+"\\"+timename+"rt.mp4")==SUCCESS){
 
-						mHik_c->playslowHik();
-						re=1;
+						if(camer_b && mHik_b->slowHik(slowtimes)==SUCCESS)
+							re=1;
 					}
-					if(camer_d && mHik_d->playbackHik(foldername+"\\"+timename+"rb.mp4")==SUCESS){
+					if(camer_c && mHik_c->playbackHik(foldername+"\\"+timename+"lb.mp4")==SUCCESS){
 
-						mHik_d->playslowHik();
-						re=1;
+						if(camer_c && mHik_c->slowHik(slowtimes)==SUCCESS)
+							re=1;
 					}
+					if(camer_d && mHik_d->playbackHik(foldername+"\\"+timename+"rb.mp4")==SUCCESS){
+
+						if(camer_d && mHik_d->slowHik(slowtimes)==SUCCESS)
+							re=1;
+					}
+
 					if(re==1){
 						SetTimer(LIVE_TIMER,500,NULL);
 					}
@@ -608,26 +769,26 @@ void CgaoqingDlg::Command_Disposal_Ser(char command)
 		tabSettings.EnableWindow(true);
 		if(camer_a){
 			//mHik_a->stopplaybackHik();
-			mHik_a->stopsaveFileHik();
-			mHik_a->stopdisplayHik();
+			mHik_a->stopsavefileHik();
+			mHik_a->stopplayliveHik();
 			//mHik_a->stopplaybackHik();
 		}
 		if(camer_b){
 			//mHik_b->stopplaybackHik();
-			mHik_b->stopsaveFileHik();
-			mHik_b->stopdisplayHik();
+			mHik_b->stopsavefileHik();
+			mHik_b->stopplayliveHik();
 			//mHik_b->stopplaybackHik();
 		}
 		if(camer_c){
 			//mHik_c->stopplaybackHik();
-			mHik_c->stopsaveFileHik();
-			mHik_c->stopdisplayHik();
+			mHik_c->stopsavefileHik();
+			mHik_c->stopplayliveHik();
 			//mHik_c->stopplaybackHik();
 		}
 		if(camer_d){
 			//mHik_d->stopplaybackHik();
-			mHik_d->stopsaveFileHik();
-			mHik_d->stopdisplayHik();
+			mHik_d->stopsavefileHik();
+			mHik_d->stopplayliveHik();
 			//mHik_d->stopplaybackHik();
 		}
 
@@ -752,7 +913,6 @@ CRect CgaoqingDlg::ChangeSize(CWnd *pWnd, int left, int top, int width, int heig
 		//ScreenToClient(&old_rect);//将控件大小转换为在对话框中的区域坐标   
 		//rect.left=rect.left*cx/m_rect.Width();//调整控件大小  
 		//rect.right=rect.right*cx/m_rect.Width();  
-		//rect.top=rect.top*cy/m_rect.Height();  
 		//rect.bottom=rect.bottom*cy/m_rect.Height();  
 		new_rect.left=left;//调整控件大小  
 		new_rect.right=left+width;  
@@ -767,38 +927,38 @@ CRect CgaoqingDlg::ChangeSize(CWnd *pWnd, int left, int top, int width, int heig
 
 
 
-DWORD CgaoqingDlg::getVideoTime()
+DWORD CgaoqingDlg::getVideoTime(bool isRec)
 {
 	DWORD len=0;
-	if(mHik_a != NULL)
+	if(isRec?mHik_a->rec:camer_a)
 		len = mHik_a->playtimeHik();
 	if(len ==0){
-		if(mHik_b != NULL){
+		if(isRec?mHik_b->rec:camer_b){
 			len = mHik_a->playtimeHik();
 		}
 	}else{
-		if(mHik_b != NULL){
+		if(isRec?mHik_b->rec:camer_b){
 			len =min(len,mHik_b->playtimeHik());
 		}
 	}
 		
 
 	if(len ==0){
-		if(mHik_c != NULL){
+		if(isRec?mHik_c->rec:camer_c){
 			len = mHik_c->playtimeHik();
 		}
 	}else{
-		if(mHik_c != NULL){
+		if(isRec?mHik_c->rec:camer_c){
 			len =min(len,mHik_c->playtimeHik());
 		}
 	}
 
 	if(len ==0){
-		if(mHik_d != NULL){
+		if(isRec?mHik_d->rec:camer_d){
 			len = mHik_d->playtimeHik();
 		}
 	}else{
-		if(mHik_d != NULL){
+		if(isRec?mHik_d->rec:camer_d){
 			len =min(len,mHik_d->playtimeHik());
 		}
 	}
@@ -808,129 +968,147 @@ DWORD CgaoqingDlg::getVideoTime()
 
 	return len;
 }
-DWORD CgaoqingDlg::getPlayedTime()
+DWORD CgaoqingDlg::getPlayedTime(bool isRec)
 {
 	DWORD len=0;
-	if(mHik_a != NULL)
+	if(isRec?mHik_a->rec:camer_a)
 		return mHik_a->playedtimeHik();
-	if(mHik_b != NULL)
+	if(isRec?mHik_b->rec:camer_b)
 		return mHik_a->playedtimeHik();
-	if(mHik_c != NULL)
+	if(isRec?mHik_c->rec:camer_c)
 		return mHik_c->playedtimeHik();
-	if(mHik_d != NULL)
+	if(isRec?mHik_d->rec:camer_d)
 		return mHik_d->playedtimeHik();
 	return 0;
 }
 int CgaoqingDlg::playVideoPos(DWORD pos)
 {
 	if(
-		mHik_a !=NULL ?mHik_a->playposHik(pos)==SUCESS:SUCESS &&
-		mHik_b !=NULL ?mHik_b->playposHik(pos)==SUCESS:SUCESS &&
-		mHik_c !=NULL ?mHik_c->playposHik(pos)==SUCESS:SUCESS &&
-		mHik_d !=NULL ?mHik_d->playposHik(pos)==SUCESS:SUCESS){
-		return SUCESS;
+		(mHik_a->rec ?mHik_a->playposHik(pos)==SUCCESS:true) &
+		(mHik_b->rec ?mHik_b->playposHik(pos)==SUCCESS:true) &
+		(mHik_c->rec ?mHik_c->playposHik(pos)==SUCCESS:true) &
+		(mHik_d->rec ?mHik_d->playposHik(pos)==SUCCESS:true)){
+		return SUCCESS;
 	}
 	return FAIL;
 }
-int CgaoqingDlg::stopVideo()
+int CgaoqingDlg::playLive(bool display)
 {
 	if(
-		mHik_a !=NULL ?mHik_a->stopplaybackHik()==SUCESS:SUCESS &&
-		mHik_b !=NULL ?mHik_b->stopplaybackHik()==SUCESS:SUCESS &&
-		mHik_c !=NULL ?mHik_c->stopplaybackHik()==SUCESS:SUCESS &&
-		mHik_d !=NULL ?mHik_d->stopplaybackHik()==SUCESS:SUCESS){
-		return SUCESS;
+		(camer_a ?mHik_a->playliveHik(display)==SUCCESS:true) &
+		(camer_b ?mHik_b->playliveHik(display)==SUCCESS:true) &
+		(camer_c ?mHik_c->playliveHik(display)==SUCCESS:true) &
+		(camer_d ?mHik_d->playliveHik(display)==SUCCESS:true)){
+
+			if(!display){
+				CStatic *wd = (CStatic *)GetDlgItem(IDC_STATIC_PLAY_A);
+				wd->SetBitmap(NULL);
+				wd = (CStatic *)GetDlgItem(IDC_STATIC_PLAY_B);
+				wd->SetBitmap(NULL);
+				wd = (CStatic *)GetDlgItem(IDC_STATIC_PLAY_C);
+				wd->SetBitmap(NULL);
+				wd = (CStatic *)GetDlgItem(IDC_STATIC_PLAY_D);
+				wd->SetBitmap(NULL);
+				Invalidate(TRUE);
+			}
+
+
+
+		return SUCCESS;
+	}
+	return FAIL;
+}
+int CgaoqingDlg::stopVideo(bool isRec)
+{
+	if(
+		(isRec?mHik_a->rec:camer_a ?mHik_a->stopplaybackHik()==SUCCESS:true) &
+		(isRec?mHik_b->rec:camer_b ?mHik_b->stopplaybackHik()==SUCCESS:true) &
+		(isRec?mHik_c->rec:camer_c ?mHik_c->stopplaybackHik()==SUCCESS:true) &
+		(isRec?mHik_d->rec:camer_d ?mHik_d->stopplaybackHik()==SUCCESS:true)){
+		return SUCCESS;
 	}
 	return FAIL;
 }
 int CgaoqingDlg::resumeVideo()
 {
 	if(
-		mHik_a !=NULL ?mHik_a->resumeHik()==SUCESS:SUCESS &&
-		mHik_b !=NULL ?mHik_b->resumeHik()==SUCESS:SUCESS &&
-		mHik_c !=NULL ?mHik_c->resumeHik()==SUCESS:SUCESS &&
-		mHik_d !=NULL ?mHik_d->resumeHik()==SUCESS:SUCESS){
-		return SUCESS;
+		(mHik_a->rec ?mHik_a->resumeHik()==SUCCESS:true) &
+		(mHik_b->rec ?mHik_b->resumeHik()==SUCCESS:true) &
+		(mHik_c->rec ?mHik_c->resumeHik()==SUCCESS:true) &
+		(mHik_d->rec ?mHik_d->resumeHik()==SUCCESS:true)){
+		return SUCCESS;
 	}
 	
-	if(	mHik_a !=NULL)  mHik_a->pauseHik();
-	if(	mHik_b !=NULL)  mHik_b->pauseHik();
-	if(	mHik_c !=NULL)  mHik_c->pauseHik();
-	if(	mHik_d !=NULL)  mHik_d->pauseHik();
 	
 	return FAIL;
 }
 int CgaoqingDlg::pauseVideo()
 {
 	if(
-		mHik_a !=NULL ?mHik_a->pauseHik()==SUCESS:SUCESS &&
-		mHik_b !=NULL ?mHik_b->pauseHik()==SUCESS:SUCESS &&
-		mHik_c !=NULL ?mHik_c->pauseHik()==SUCESS:SUCESS &&
-		mHik_d !=NULL ?mHik_d->pauseHik()==SUCESS:SUCESS){
-		return SUCESS;
+		(mHik_a->rec ?mHik_a->pauseHik()==SUCCESS:true) &
+		(mHik_b->rec ?mHik_b->pauseHik()==SUCCESS:true) &
+		(mHik_c->rec ?mHik_c->pauseHik()==SUCCESS:true) &
+		(mHik_d->rec ?mHik_d->pauseHik()==SUCCESS:true)){
+		return SUCCESS;
 	}
 	
-	if(	mHik_a !=NULL)  mHik_a->playHik();
-	if(	mHik_b !=NULL)  mHik_b->playHik();
-	if(	mHik_c !=NULL)  mHik_c->playHik();
-	if(	mHik_d !=NULL)  mHik_d->playHik();
 	
 	return FAIL;
 }
 int CgaoqingDlg::fastVideo()
 {
 	if(
-		mHik_a !=NULL ?mHik_a->fastHik()==SUCESS:SUCESS &&
-		mHik_b !=NULL ?mHik_b->fastHik()==SUCESS:SUCESS &&
-		mHik_c !=NULL ?mHik_c->fastHik()==SUCESS:SUCESS &&
-		mHik_d !=NULL ?mHik_d->fastHik()==SUCESS:SUCESS){
-		return SUCESS;
+		(mHik_a->rec ?mHik_a->fastHik()==SUCCESS:true) &
+		(mHik_b->rec ?mHik_b->fastHik()==SUCCESS:true) &
+		(mHik_c->rec ?mHik_c->fastHik()==SUCCESS:true) &
+		(mHik_d->rec ?mHik_d->fastHik()==SUCCESS:true)){
+		return SUCCESS;
 	}
 	
-	if(	mHik_a !=NULL)  mHik_a->playHik();
-	if(	mHik_b !=NULL)  mHik_b->playHik();
-	if(	mHik_c !=NULL)  mHik_c->playHik();
-	if(	mHik_d !=NULL)  mHik_d->playHik();
+	if(	mHik_a->rec)  mHik_a->resumeHik();
+	if(	mHik_b->rec)  mHik_b->resumeHik();
+	if(	mHik_c->rec)  mHik_c->resumeHik();
+	if(	mHik_d->rec)  mHik_d->resumeHik();
 	
 	return FAIL;
 }
 int CgaoqingDlg::slowVideo()
 {
 	if(
-		mHik_a !=NULL ?mHik_a->slowHik()==SUCESS:SUCESS &&
-		mHik_b !=NULL ?mHik_b->slowHik()==SUCESS:SUCESS &&
-		mHik_c !=NULL ?mHik_c->slowHik()==SUCESS:SUCESS &&
-		mHik_d !=NULL ?mHik_d->slowHik()==SUCESS:SUCESS){
-		return SUCESS;
+		(mHik_a->rec ?mHik_a->slowHik(1)==SUCCESS:true) &
+		(mHik_b->rec ?mHik_b->slowHik(1)==SUCCESS:true) &
+		(mHik_c->rec ?mHik_c->slowHik(1)==SUCCESS:true) &
+		(mHik_d->rec ?mHik_d->slowHik(1)==SUCCESS:true)){
+		return SUCCESS;
 	}
 	
-	if(	mHik_a !=NULL)  mHik_a->resumeHik();
-	if(	mHik_b !=NULL)  mHik_b->resumeHik();
-	if(	mHik_c !=NULL)  mHik_c->resumeHik();
-	if(	mHik_d !=NULL)  mHik_d->resumeHik();
+	if(	mHik_a->rec)  mHik_a->resumeHik();
+	if(	mHik_b->rec)  mHik_b->resumeHik();
+	if(	mHik_c->rec)  mHik_c->resumeHik();
+	if(	mHik_d->rec)  mHik_d->resumeHik();
 	
 	return FAIL;
 }
 int CgaoqingDlg::saveParams(BYTE bright,BYTE contrast,BYTE sharpness,BYTE saturation,int exp_mode,int exp_time,int daynight)
 {
 	if(
-		mHik_a !=NULL ?mHik_a->saveParamHik(bright,contrast,sharpness,saturation,exp_mode,exp_time,daynight)==SUCESS:SUCESS &&
-		mHik_b !=NULL ?mHik_b->saveParamHik(bright,contrast,sharpness,saturation,exp_mode,exp_time,daynight)==SUCESS:SUCESS &&
-		mHik_c !=NULL ?mHik_c->saveParamHik(bright,contrast,sharpness,saturation,exp_mode,exp_time,daynight)==SUCESS:SUCESS &&
-		mHik_d !=NULL ?mHik_d->saveParamHik(bright,contrast,sharpness,saturation,exp_mode,exp_time,daynight)==SUCESS:SUCESS){
-		return SUCESS;
+		(camer_a ?mHik_a->saveParamHik(bright,contrast,sharpness,saturation,exp_mode,exp_time,daynight)==SUCCESS:true) &
+		(camer_b ?mHik_b->saveParamHik(bright,contrast,sharpness,saturation,exp_mode,exp_time,daynight)==SUCCESS:true) &
+		(camer_c ?mHik_c->saveParamHik(bright,contrast,sharpness,saturation,exp_mode,exp_time,daynight)==SUCCESS:true) &
+		(camer_d ?mHik_d->saveParamHik(bright,contrast,sharpness,saturation,exp_mode,exp_time,daynight)==SUCCESS:true)){
+		return SUCCESS;
 	}else
 		return FAIL;
 }
 PARAM_STRU CgaoqingDlg::getParams()
 {
-	if(mHik_a !=NULL){
+	if(camer_a){
 		return mHik_a->getParamHik();
-	}else if(mHik_b !=NULL){
+	}else if(camer_b){
 		return mHik_b->getParamHik();
-	}else if(mHik_c !=NULL){
+	}else if(camer_c){
 		return mHik_c->getParamHik();
-	}else if(mHik_d !=NULL){
+	}else if(camer_d){
 		return mHik_d->getParamHik();
 	}else {
 		PARAM_STRU str;
@@ -942,31 +1120,47 @@ bool CgaoqingDlg::playVideo(CString patha,CString pathb,CString pathc,CString pa
 {
 	bool result=FAIL;
 	if(!patha.IsEmpty()){
-		if(mHik_a->playbackHik(patha)==SUCESS){
-			result = SUCESS;
+
+		mHik_a->rec = true;
+		if(mHik_a->playbackHik(patha)==SUCCESS){
+			result = SUCCESS;
 		}else
 			result = FAIL;
+	}else{
+		mHik_a->rec = false;
 	}
 
 	if(!pathb.IsEmpty()){ 
-		if(mHik_b->playbackHik(pathb)==SUCESS){
-			result = SUCESS;
+		mHik_b->rec = true;
+		if(mHik_b->playbackHik(pathb)==SUCCESS){
+			result = SUCCESS;
 		}else
 			result = FAIL;
+	}else{
+		mHik_b->rec = false;
 	}
-	if(!pathc.IsEmpty()){
-		if(mHik_c->playbackHik(pathc)==SUCESS){
 
-			result = SUCESS;
+	if(!pathc.IsEmpty()){
+		mHik_c->rec = true;
+		if(mHik_c->playbackHik(pathc)==SUCCESS){
+
+			result = SUCCESS;
 		}else
 			result = FAIL;
+	}else{
+		mHik_c->rec = false;
 	}
-	if(!pathd.IsEmpty()){ \
-		if(mHik_d->playbackHik(pathd)==SUCESS){
-			result = SUCESS;
+
+	if(!pathd.IsEmpty()){ 
+		mHik_d->rec = true;
+		if(mHik_d->playbackHik(pathd)==SUCCESS){
+			result = SUCCESS;
 		}else
 			result = FAIL;
+	}else{
+		mHik_d->rec = false;
 	}
+
 	return result;
 }
 void CgaoqingDlg::post_message(LPCTSTR format, ...)
@@ -1011,7 +1205,7 @@ void CgaoqingDlg::OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult)
 		GetDlgItem(IDC_BUTTON_REC_FAST)->EnableWindow(false);
 		GetDlgItem(IDC_BUTTON_REC_SLOW)->EnableWindow(false);
 
-		if (stopVideo())
+		if (stopVideo(true))
 		{
 			
 		}
@@ -1050,12 +1244,14 @@ void CgaoqingDlg::OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult)
 		dFind.ShowWindow(false);
 		dSetting.ShowWindow(true);
 
+		dSetting.SetFocus();
+
 		GetDlgItem(IDC_SLIDER_PLAY)->EnableWindow(false);
 		GetDlgItem(IDC_BUTTON_REC_PLAY)->EnableWindow(false);
 		GetDlgItem(IDC_BUTTON_REC_FAST)->EnableWindow(false);
 		GetDlgItem(IDC_BUTTON_REC_SLOW)->EnableWindow(false);
 
-		if (stopVideo())
+		if (stopVideo(true))
 		{
 			
 		}
@@ -1082,53 +1278,56 @@ bool CgaoqingDlg::loginCamera()
 	
 	if(camer_a){
 		
-		mHik_a->ip = getCStringFromConfig("CAMA","Ip");
-		mHik_a->port =atoi(getCStringFromConfig("CAMA","Port"));
-		mHik_a->name = getCStringFromConfig("CAMA","User");
-		mHik_a->pwd = getCStringFromConfig("CAMA","Password");
+		mHik_a->mIp = getCStringFromConfig("CAMA","Ip");
+		mHik_a->mPort =atoi(getCStringFromConfig("CAMA","Port"));
+		mHik_a->mName = getCStringFromConfig("CAMA","User");
+		mHik_a->mPwd = getCStringFromConfig("CAMA","Password");
 
 
-		if(mHik_a->loginHik()!=SUCESS){
+		if(mHik_a->loginHik()!=SUCCESS){
 			re=false;
 		}
 	}
 	if(camer_b && re){
 
-		mHik_b->ip = getCStringFromConfig("CAMB","Ip");
-		mHik_b->port =atoi(getCStringFromConfig("CAMB","Port"));
-		mHik_b->name = getCStringFromConfig("CAMB","User");
-		mHik_b->pwd = getCStringFromConfig("CAMB","Password");
+		mHik_b->mIp = getCStringFromConfig("CAMB","Ip");
+		mHik_b->mPort =atoi(getCStringFromConfig("CAMB","Port"));
+		mHik_b->mName = getCStringFromConfig("CAMB","User");
+		mHik_b->mPwd = getCStringFromConfig("CAMB","Password");
 
-		if(mHik_b->loginHik()!=SUCESS){
+		if(mHik_b->loginHik()!=SUCCESS){
 			re=false;
 		}
 	}
 	if(camer_c && re){
 
-		mHik_c->ip = getCStringFromConfig("CAMC","Ip");
-		mHik_c->port =atoi(getCStringFromConfig("CAMC","Port"));
-		mHik_c->name = getCStringFromConfig("CAMC","User");
-		mHik_c->pwd = getCStringFromConfig("CAMC","Password");
+		mHik_c->mIp = getCStringFromConfig("CAMC","Ip");
+		mHik_c->mPort =atoi(getCStringFromConfig("CAMC","Port"));
+		mHik_c->mName = getCStringFromConfig("CAMC","User");
+		mHik_c->mPwd = getCStringFromConfig("CAMC","Password");
 
-		if(mHik_c->loginHik()!=SUCESS){
+		if(mHik_c->loginHik()!=SUCCESS){
 			re=false;
 		}
 	}
 	if(camer_d && re){
 
 
-		mHik_d->ip = getCStringFromConfig("CAMD","Ip");
-		mHik_d->port =atoi(getCStringFromConfig("CAMD","Port"));
-		mHik_d->name = getCStringFromConfig("CAMD","User");
-		mHik_d->pwd = getCStringFromConfig("CAMD","Password");
+		mHik_d->mIp = getCStringFromConfig("CAMD","Ip");
+		mHik_d->mPort =atoi(getCStringFromConfig("CAMD","Port"));
+		mHik_d->mName = getCStringFromConfig("CAMD","User");
+		mHik_d->mPwd = getCStringFromConfig("CAMD","Password");
 
-		if(mHik_d->loginHik()!=SUCESS){
+		if(mHik_d->loginHik()!=SUCCESS){
 			re=false;
 		}
 	}
 	if(!re)
 	{
 		logoutCamera();
+	}else{
+		playLive(true);
+		
 	}
 	return re;
 }
@@ -1136,26 +1335,24 @@ void CgaoqingDlg::OnBnClickedButtonRecPlay()
 {
 	if (s_Play)
 	{
-		if (pauseVideo())
+		if (pauseVideo()==SUCCESS)
 		{
-			
+			s_Play=FALSE;
+			GetDlgItem(IDC_BUTTON_REC_PLAY)->SetWindowText("播放");
+			GetDlgItem(IDC_BUTTON_REC_FAST)->EnableWindow(false);
+			GetDlgItem(IDC_BUTTON_REC_SLOW)->EnableWindow(false);
 		}
-			
-		s_Play=FALSE;
-		GetDlgItem(IDC_BUTTON_REC_PLAY)->SetWindowText("播放");
-		GetDlgItem(IDC_BUTTON_REC_FAST)->EnableWindow(false);
-		GetDlgItem(IDC_BUTTON_REC_SLOW)->EnableWindow(false);
 	}
 	else
 	{
-		if (resumeVideo())
+		if (resumeVideo()==SUCCESS)
 		{
-			
+			s_Play=TRUE;
+			GetDlgItem(IDC_BUTTON_REC_PLAY)->SetWindowText("暂停");
+			GetDlgItem(IDC_BUTTON_REC_FAST)->EnableWindow(true);
+			GetDlgItem(IDC_BUTTON_REC_SLOW)->EnableWindow(true);
 		}
-		s_Play=TRUE;
-		GetDlgItem(IDC_BUTTON_REC_PLAY)->SetWindowText("暂停");
-		GetDlgItem(IDC_BUTTON_REC_FAST)->EnableWindow(true);
-		GetDlgItem(IDC_BUTTON_REC_SLOW)->EnableWindow(true);
+		
 	}
 }
 
@@ -1163,7 +1360,7 @@ void CgaoqingDlg::OnBnClickedButtonRecFast()
 {
 	if(playSpeed <4){
 	{
-		if (fastVideo()==SUCESS)
+		if (fastVideo()==SUCCESS)
 			playSpeed++;	
 
 			CString str;
@@ -1207,7 +1404,7 @@ void CgaoqingDlg::OnBnClickedButtonRecSlow()
 {
 	if(playSpeed >-4){
 	{
-		if (slowVideo()==SUCESS)
+		if (slowVideo()==SUCCESS)
 			playSpeed--;	
 
 			CString str;
@@ -1252,22 +1449,19 @@ void CgaoqingDlg::OnNMReleasedcaptureSliderPlay(NMHDR *pNMHDR, LRESULT *pResult)
 	int nPos = 0;
 	nPos = playslider.GetPos();
 	//m_sliderPlayProgress.SetPos(nPos);
-	if(playVideoPos(nPos)==SUCESS)
+	if(playVideoPos(nPos)==SUCCESS)
 	{
+		*pResult = 0;
 	}
-	/*if (!PlayM4_SetPlayedTimeEx(USED_PORT_A, nPos))
-	{
-	DWORD getVideoTime();
-	int playVideoPos(DWORD pos);
-	}*/
+	adjust = false;
 	*pResult = 0;
 }
 void CgaoqingDlg::logoutCamera()
 {
-	if(camer_a && mHik_a->stopFileHik()==SUCESS){
+	if(camer_a && mHik_a->stopsavefileHik()==SUCCESS){
 			
-		if(mHik_a->stopPlayHik()==SUCESS){
-			if(mHik_a->logoutHik()==SUCESS){
+		if(mHik_a->stopplayliveHik()==SUCCESS){
+			if(mHik_a->logoutHik()==SUCCESS){
 					
 			}
 				
@@ -1276,10 +1470,10 @@ void CgaoqingDlg::logoutCamera()
 			
 	}
 
-	if(camer_b && mHik_b->stopFileHik()==SUCESS){
+	if(camer_b && mHik_b->stopsavefileHik()==SUCCESS){
 			
-		if(mHik_b->stopPlayHik()==SUCESS){
-			if(mHik_b->logoutHik()==SUCESS){
+		if(mHik_b->stopplayliveHik()==SUCCESS){
+			if(mHik_b->logoutHik()==SUCCESS){
 					
 			}
 				
@@ -1288,10 +1482,10 @@ void CgaoqingDlg::logoutCamera()
 			
 	}
 
-	if(camer_c && mHik_c->stopFileHik()==SUCESS){
+	if(camer_c && mHik_c->stopsavefileHik()==SUCCESS){
 			
-		if(mHik_c->stopPlayHik()==SUCESS){
-			if(mHik_c->logoutHik()==SUCESS){
+		if(mHik_c->stopplayliveHik()==SUCCESS){
+			if(mHik_c->logoutHik()==SUCCESS){
 					
 			}
 				
@@ -1300,10 +1494,10 @@ void CgaoqingDlg::logoutCamera()
 			
 	}
 
-	if(camer_d && mHik_d->stopFileHik()==SUCESS){
+	if(camer_d && mHik_d->stopsavefileHik()==SUCCESS){
 			
-		if(mHik_d->stopPlayHik()==SUCESS){
-			if(mHik_d->logoutHik()==SUCESS){
+		if(mHik_d->stopplayliveHik()==SUCCESS){
+			if(mHik_d->logoutHik()==SUCCESS){
 					
 			}
 				
@@ -1636,14 +1830,13 @@ void CgaoqingDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CgaoqingDlg::ShowLivePlayBackState()
 {
-	//DWORD totaltime = dlg->getVideoTime();
-	DWORD len =	getVideoTime()*1000;
+	DWORD len =	getVideoTime(false)*1000;
 	if (len == 0)
 	{
 		return;
 	}
 
-	DWORD nCurTime=getPlayedTime();
+	DWORD nCurTime=getPlayedTime(false);
 	//post_message(_T("%d-%d\r\n"),len,nCurTime);
 	//parent->playslider.SetPos(nCurTime);
 	/*CString csStatus;
@@ -1655,7 +1848,7 @@ void CgaoqingDlg::ShowLivePlayBackState()
 	*/
 	if (nCurTime > len-100)
 	{
-		stopVideo();
+		stopVideo(false);
 		CStatic *wd = (CStatic *)GetDlgItem(IDC_STATIC_PLAY_A);
 		wd->SetBitmap(NULL);
 		wd = (CStatic *)GetDlgItem(IDC_STATIC_PLAY_B);
@@ -1665,6 +1858,11 @@ void CgaoqingDlg::ShowLivePlayBackState()
 		wd = (CStatic *)GetDlgItem(IDC_STATIC_PLAY_D);
 		wd->SetBitmap(NULL);
 		Invalidate(TRUE);
+
+
+		playLive(true);
+
+
 		//GetDlgItem(IDC_BUTTON_REC_PLAY)->SetWindowText("播放");
 		//OnBnClickedBtnLocalStop();
 		KillTimer(LIVE_TIMER);
@@ -1674,3 +1872,22 @@ void CgaoqingDlg::ShowLivePlayBackState()
 
 	//GetDlgItem(IDC_STATIC_LOCAL_PLAY_STATUS)->SetWindowText(csStatus);
 }
+
+/*
+void CgaoqingDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	// TODO: Add your message handler code here and/or call default
+switch (nSBCode)
+	{
+	case TB_THUMBTRACK: 
+		if (pScrollBar->GetSafeHwnd() == playslider.GetSafeHwnd())//如果拖动的是滑块
+		{
+			CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
+		}
+		break;
+	default:
+		return;
+	}
+
+	
+}*/

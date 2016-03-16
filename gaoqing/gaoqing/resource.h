@@ -37,6 +37,7 @@
 #define IDC_LOGOUT                      1014
 #define IDC_LOGIN                       1015
 #define IDC_LIST1                       1016
+#define IDC_LIST11                      1016
 #define IDC_LIST2                       1017
 #define IDC_STATIC_PLAY_B               1018
 #define IDC_IPADDRESS_C                 1018
@@ -82,7 +83,10 @@
 #define IDC_COMBO7                      1042
 #define IDC_DAYNIGHT                    1042
 #define IDC_EDIT2                       1043
-#define IDC_IPADDRESS1                  1044
+#define IDC_STATIC1                     1045
+#define IDC_STATIC2                     1046
+#define IDC_STATIC3                     1047
+#define IDC_SCROLLBAR1                  1048
 
 // Next default values for new objects
 // 
@@ -90,7 +94,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1045
+#define _APS_NEXT_CONTROL_VALUE         1049
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
