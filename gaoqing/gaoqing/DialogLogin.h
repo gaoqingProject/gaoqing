@@ -1,3 +1,8 @@
+/*
+File name:   DialogLogin.h
+File Author: Li Weichen
+Date:        2016.3.1
+*/
 #pragma once
 #include "afxcmn.h"
 #include "afxwin.h"
@@ -13,27 +18,18 @@ class CDialogLogin : public CDialog
 public:
 	CDialogLogin(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CDialogLogin();
-	CString getIp();
-	int getPort();
 
-
+	//===== member variables ====
 	CgaoqingDlg *parent;
-	
-	CString getCStringFromConfig(CString cam,CString sub);
-	//void setIntToConfig(CString cam,CString ip);
-	void setCStringToConfig(CString cam,CString sub,CString str);
+	CListBox output_list_;
 
-	int transCStringToInt(CString addstr);
-
+	//===== message fuction =====
 	void OnOK();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnBnClickedButtonx();
 
 // Dialog Data
 	enum { IDD = IDD_DIALOG_LOGIN };
-private:
-	BOOL m_bIsLogin;
-	BOOL m_bIsPlaying;
-	BOOL m_bIsRecording;
-	
 	
 	
 
@@ -42,12 +38,6 @@ protected:
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnBnClickedButtonx();
-public:
-	CListBox output_list_;
 
-
-public:
-	afx_msg void OnSize(UINT nType, int cx, int cy);
+	
 };

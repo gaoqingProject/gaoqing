@@ -1,6 +1,8 @@
-// DialogLogin.cpp : implementation file
-//
-
+/*
+File name:   DialogLogin.cpp
+File Author: Li Weichen
+Date:        2016.3.1
+*/
 #include "stdafx.h"
 #include "gaoqing.h"
 #include "DialogLogin.h"
@@ -15,12 +17,6 @@ CDialogLogin::CDialogLogin(CWnd* pParent /*=NULL*/)
 	: CDialog(CDialogLogin::IDD, pParent)
 
 {
-
-	//===============HIK==================
-	m_bIsLogin = FALSE;
-	m_bIsPlaying = FALSE;
-	m_bIsRecording = FALSE;
-	//====================================
 }
 
 CDialogLogin::~CDialogLogin()
@@ -32,20 +28,19 @@ void CDialogLogin::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST1, output_list_);
 }
+/*************************************************
+Function:  OnInitDialog
+Desc:	   初始化对话框
+Input:     void
+Return:	   true
+**************************************************/
 BOOL CDialogLogin::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	
-	
-	
-
-	
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
 BEGIN_MESSAGE_MAP(CDialogLogin, CDialog)
-	
-	
 	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
@@ -59,63 +54,14 @@ void CDialogLogin::OnOK(){
 
 	return;
 }
-/*
-void CDialogLogin::OnPlayClicked()
-{
-
-	
-	if(mHik->playbackHik("test.mp4")==SUCCESS){
-	}
-}*/
-/*
-void CDialogLogin::OnLoginClicked()
-{
-	loginCamera(IDC_STATIC_PLAY_A);
-
-}*/
-
-
-//=========================================================================================
-
-
-
-
-
-/*
-void CDialogLogin::OnLogoutClicked()
-{
-	if(mHik->stopFileHik()==SUCCESS){
-		m_bIsRecording = FALSE;
-		if(mHik->stopplayliveHik()==SUCCESS){
-
-		}
-		mHik->logoutHik();
-	}
-}
-*/
-/*void CDialogLogin::OnStartClick()
-{
-	// TODO: Add your control notification handler code here
-
-	if(!m_bIsLogin){
-		if(loginCamera()){
-
-			CgaoqingDlg *p = (CgaoqingDlg *)parent;
-			p->startUART();
-			GetDlgItem(IDC_BUTTON_START)->SetWindowText("停止");
-
-			
-		}
-	}else{
-		CgaoqingDlg *p = (CgaoqingDlg *)parent;
-		logoutCamera();
-		p->stopUART();
-		GetDlgItem(IDC_BUTTON_START)->SetWindowText("开始");
-	}
-	
-}*/
-
-
+/*************************************************
+Function:  OnSize
+Desc:	   对话框大小改变函数
+Input:     UINT nType 
+		   int cx 宽度
+		   int cy 高度
+Return:	   void
+**************************************************/
 void CDialogLogin::OnSize(UINT nType, int cx, int cy)
 {
 	CDialog::OnSize(nType, cx, cy);
@@ -129,5 +75,4 @@ void CDialogLogin::OnSize(UINT nType, int cx, int cy)
 		new_rect.bottom=cy;  
 		pWnd->MoveWindow(new_rect);//设置控件大小  
 	}
-	// TODO: Add your message handler code here
 }

@@ -1,4 +1,8 @@
-
+/*
+File name:   SerialPort.cpp
+File Author: Li Weichen
+Date:        2016.3.1
+*/
 #include "StdAfx.h"
 #include "SerialPort.h"
 #include <process.h>

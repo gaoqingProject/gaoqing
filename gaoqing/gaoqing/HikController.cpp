@@ -399,7 +399,6 @@ void HikController::getdecodercfgHik(LOCAL_DEVICE_INFO *info)
 
 }
 
-//=======================================================11.5======================================================
 
 /*************************************************
 Function:   playliveHik
@@ -440,18 +439,7 @@ bool HikController::playliveHik(bool isPlay)
 	return SUCCESS;
 
 }
-/*************************************************
-Function:   stopplayliveHik
-Desc:	    停止直播录像
-Input:      设备info
-Return:		handle 成功
-            FAIL 失败
-**************************************************/
-/*void HikController::stopplayliveHik()
-{
-	NET_DVR_StopRealPlay(handle);
-	handle=-1;
-}*/
+
 /*************************************************
 Function:   savefileHik
 Desc:	    保存录像
@@ -459,7 +447,7 @@ Input:      设备info
 Return:		SUCCESS 成功
             FAIL 失败
 **************************************************/
-bool HikController::savefileHik(CString file)
+int HikController::savefileHik(CString file)
 {
 	char *RecName=file.GetBuffer(file.GetLength());
 	if(NET_DVR_SaveRealData(handle,RecName))
@@ -477,7 +465,7 @@ Input:      设备info
 Return:		SUCCESS 成功
             FAIL 失败
 **************************************************/
-bool HikController::stopsavefileHik()
+int HikController::stopsavefileHik()
 {
 	if(!NET_DVR_StopSaveRealData(handle))
 	{

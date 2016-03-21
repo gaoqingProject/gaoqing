@@ -1,6 +1,8 @@
-// gaoqing.cpp : Defines the class behaviors for the application.
-//
-
+/*
+File name:   gaoqing.cpp
+File Author: Li Weichen
+Date:        2016.3.1
+*/
 #include "stdafx.h"
 #include "gaoqing.h"
 #include "gaoqingDlg.h"

@@ -1,6 +1,8 @@
-// gaoqing.h : main header file for the PROJECT_NAME application
-//
-
+/*
+File name:   CgaoqingApp.h
+File Author: Li Weichen
+Date:        2016.3.1
+*/
 #pragma once
 
 #ifndef __AFXWIN_H__

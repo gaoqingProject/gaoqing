@@ -1,6 +1,8 @@
-// gaoqingDlg.cpp : implementation file
-//
-
+/*
+File name:   gaoqingDlg.cpp
+File Author: Li Weichen
+Date:        2016.3.1
+*/
 #include "stdafx.h"
 #include "gaoqing.h"
 #include "gaoqingDlg.h"
@@ -12,6 +14,13 @@
 
 #define BUFSIZE MAX_PATH
 #define LIVE_TIMER				8		//local playback status timer
+
+char CgaoqingDlg::rx_ser[50]={};
+int  CgaoqingDlg::count_ser=0;
+int  CgaoqingDlg::longth_ser=0;
+char CgaoqingDlg::command_ser=0;
+
+
 CgaoqingDlg::CgaoqingDlg(CWnd* pParent /*=NULL*/)
 : CDialog(CgaoqingDlg::IDD, pParent),direction(0),car_n(0),pFile(INVALID_HANDLE_VALUE)
 	, mHik_a(0)
@@ -103,7 +112,13 @@ void CgaoqingDlg::OnClose()
 }
 //==========================================play record ========================
 #define TIMER_INTERVAL 500//local play back timer refresh interval
-
+/*************************************************
+Function:   initView
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::initView()
 {
 	tabSettings.InsertItem(0,_T("直播"));//“选项卡1”可更改，是sheet页的名字；
@@ -116,32 +131,28 @@ void CgaoqingDlg::initView()
 
 	CRect rs;
 	tabSettings.GetClientRect(&rs);
-	//rs.left +=10;
-	//rs.right -=10;
 	rs.top +=30;
 	rs.bottom -=30;
 
-
-
 	playslider.sign = &adjust;
 	playslider.SetPageSize(20);
-	
 
 	dLogin.MoveWindow(&rs);
 	dFind.MoveWindow(&rs);
 	dSetting.MoveWindow(&rs);
 
-	
-
 	dLogin.ShowWindow(true);
 	dFind.ShowWindow(false);
 	dSetting.ShowWindow(false);
 	tabSettings.SetCurSel(0);
-
-
-	
-
 }
+/*************************************************
+Function:   OnInitDialog
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 BOOL CgaoqingDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
@@ -176,32 +187,7 @@ BOOL CgaoqingDlg::OnInitDialog()
 	int hdis = (cy-gap-hsld-gap-hbtn-gap)/2;
 
 
-	
-
-	
-
-	
-
-	
-
-
-
-
-
-
-
-	CRect new_rect;   //获取控件变化前的大小  
-		//old_rect = getSize(pWnd);
-		//pWnd->GetWindowRect(&old_rect);  
-		//ScreenToClient(&old_rect);//将控件大小转换为在对话框中的区域坐标   
-		//rect.left=rect.left*cx/m_rect.Width();//调整控件大小  
-		//rect.right=rect.right*cx/m_rect.Width();  
-		//rect.top=rect.top*cy/m_rect.Height();  
-		//rect.bottom=rect.bottom*cy/m_rect.Height();  
-		
-
-
-
+	CRect new_rect;
 	CWnd *pWnd; 
 	
 	//GetDlgItem(IDC_SLIDER_PLAY)->GetWindowRect(&new_rect);
@@ -236,19 +222,12 @@ BOOL CgaoqingDlg::OnInitDialog()
 	new_rect.bottom=hdis*2;  
 	pWnd->MoveWindow(new_rect);//设置控件大小  
 
-
 	pWnd = GetDlgItem(IDC_STATIC_PLAY_D); 
 	new_rect.left=wdis;//调整控件大小  
 	new_rect.right=wdis*2;  
 	new_rect.top=hdis;  
 	new_rect.bottom=hdis*2;  
 	pWnd->MoveWindow(new_rect);//设置控件大小  
-
-
-	
-
-
-
 
 	pWnd = GetDlgItem(IDC_SLIDER_PLAY);
 	new_rect.left=0;//调整控件大小  
@@ -257,15 +236,12 @@ BOOL CgaoqingDlg::OnInitDialog()
 	new_rect.bottom=new_rect.top+hsld;  
 	pWnd->MoveWindow(new_rect);//设置控件大小  
 
-
-
 	pWnd = GetDlgItem(IDC_BUTTON_REC_PLAY);
 	new_rect.left=gap;//调整控件大小  
 	new_rect.right=gap+wbtn;  
 	new_rect.top=new_rect.bottom+gap;  
 	new_rect.bottom=new_rect.top+hbtn;  
 	pWnd->MoveWindow(new_rect);//设置控件大小  
-
 
 	pWnd = GetDlgItem(IDC_BUTTON_REC_FAST);
 	new_rect.left=new_rect.right+gap;//调整控件大小  
@@ -281,11 +257,7 @@ BOOL CgaoqingDlg::OnInitDialog()
 	//new_rect.bottom=hdis*2+gap+hsld;  
 	pWnd->MoveWindow(new_rect);//设置控件大小  
 
-
-
-
-
-	SetIcon(m_hIcon, TRUE);			// Set big icon
+	//SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	HikController::initHik();
@@ -305,6 +277,13 @@ BOOL CgaoqingDlg::OnInitDialog()
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
+/*************************************************
+Function:   setConfig
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::setConfig(CString category,CString item,CString val)
 {
 	CString add;
@@ -314,6 +293,13 @@ void CgaoqingDlg::setConfig(CString category,CString item,CString val)
 	add.ReleaseBuffer();
 	::WritePrivateProfileString(category,item,val,add);
 }
+/*************************************************
+Function:   getConfig
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 CString CgaoqingDlg::getConfig(CString category,CString item,CString def)
 {
 	CString add;
@@ -325,9 +311,15 @@ CString CgaoqingDlg::getConfig(CString category,CString item,CString def)
 	::GetPrivateProfileString(category,item,def,str.GetBuffer(MAX_PATH),MAX_PATH,add);
 	return str;
 }
+/*************************************************
+Function:   initParam
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::initParam()
 {
-	
 
 	direction         = 0;
 	dLogin.parent = this;
@@ -339,75 +331,35 @@ void CgaoqingDlg::initParam()
 	camer_c = atoi(getConfig("CAMC","Enable","1"));
 	camer_d = atoi(getConfig("CAMD","Enable","1"));
 
-	
-
-
 	path = getConfig("CONFIG","PATH",".\\");
 	slowtimes = atoi(getConfig("CONFIG","SlowTimes","1"));
-	/*
-	ser_com = new CSerialPort;
-	ser_com->InitPort(Port_N, Port_BAUD, Port_PARITY , Port_DBITS, Port_STOP, EV_RXCHAR);
-	ser_com->ReadFun= &CgaoqingDlg::ser_com_read;
-	ser_com->OpenListenThread();
-	ser_com->pWnd = this;*/
 
 	LONG nPort;
-	//if(camer_a){
 
-		mHik_a = new HikController();
-		mHik_a->mWind = GetDlgItem(IDC_STATIC_PLAY_A)->m_hWnd;
-		PlayM4_GetPort(&nPort);
-		mHik_a->mPlay_no = nPort;
-	//} 
-	//if(camer_b){
+	mHik_a = new HikController();
+	mHik_a->mWind = GetDlgItem(IDC_STATIC_PLAY_A)->m_hWnd;
+	PlayM4_GetPort(&nPort);
+	mHik_a->mPlay_no = nPort;
 
-		mHik_b = new HikController();
-		mHik_b->mWind = GetDlgItem(IDC_STATIC_PLAY_B)->m_hWnd;
-		PlayM4_GetPort(&nPort);
-		mHik_b->mPlay_no = nPort;
-	//} 
-	//if(camer_c){
-
-		mHik_c = new HikController();
-		mHik_c->mWind = GetDlgItem(IDC_STATIC_PLAY_C)->m_hWnd;
-		PlayM4_GetPort(&nPort);
-		mHik_c->mPlay_no = nPort;
-	//} 
-	//if(camer_d){
-
-		mHik_d = new HikController();
-		mHik_d->mWind = GetDlgItem(IDC_STATIC_PLAY_D)->m_hWnd;
-		PlayM4_GetPort(&nPort);
-		mHik_d->mPlay_no = nPort;
-	//} 
-	/*
+	mHik_b = new HikController();
 	mHik_b->mWind = GetDlgItem(IDC_STATIC_PLAY_B)->m_hWnd;
-	mHik_c->mWind = GetDlgItem(IDC_STATIC_PLAY_C)->m_hWnd;
-	mHik_d->mWind = GetDlgItem(IDC_STATIC_PLAY_D)->m_hWnd;
-
-	
-	
 	PlayM4_GetPort(&nPort);
 	mHik_b->mPlay_no = nPort;
+
+	mHik_c = new HikController();
+	mHik_c->mWind = GetDlgItem(IDC_STATIC_PLAY_C)->m_hWnd;
 	PlayM4_GetPort(&nPort);
 	mHik_c->mPlay_no = nPort;
+
+	mHik_d = new HikController();
+	mHik_d->mWind = GetDlgItem(IDC_STATIC_PLAY_D)->m_hWnd;
 	PlayM4_GetPort(&nPort);
 	mHik_d->mPlay_no = nPort;
-
-*/
 	TRY   
 	{      
-		//		m_db.OpenEx(_T("DSN = gaoqingtest;UID = sa;PWD =gaoqing1"),CDatabase::noOdbcDialog);//连接到一个名为Test的数据源   
-		//m_db.OpenEx(_T("Driver={SQL Server};Server=mySQLServer;UID=sa; PWD=myPassword;Database=NorthmWind;"); 
 		m_db.OpenEx(_T("DSN=gaoqing;UID=sa;PWD=gaoqing;"),CDatabase::noOdbcDialog);//连接到一个名为Test的数据源   
-		//m_db.OpenEx(_T("Driver={SQL Server};Server=mySQLServer;UID=sa; PWD=myPassword;Database=NorthmWind;"); 
-		//m_db.OpenEx(_T("DSN=gaoqing;"),CDatabase::noOdbcDialog);//连接到一个名为Test的数据源   
 		rs_train.m_pDatabase = &m_db;   
-		//rs_details.m_pDatabase = &m_db;  
-		//rs_train.Open(CRecordset::snapshot,_T("tbl_train"));  
-		//rs_details.Open(CRecordset::snapshot,_T("tbl_train_details")); 
 	}  
-	//////////////////////////处理异常消息   
 	CATCH(CDBException,ex)  
 	{      
 		AfxMessageBox(ex->m_strError);  
@@ -415,7 +367,7 @@ void CgaoqingDlg::initParam()
 	}   
 	AND_CATCH(CMemoryException,pEx)   
 	{    pEx->ReportError();   
-		AfxMessageBox(_T("memory exception"));   
+	AfxMessageBox(_T("memory exception"));   
 	} AND_CATCH(CException,ex)   
 	{      
 		TCHAR szError[100];      
@@ -425,6 +377,13 @@ void CgaoqingDlg::initParam()
 	END_CATCH 
 
 }
+/*************************************************
+Function:   startUART
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::startUART()
 {
 	Port_N        = atoi(getConfig("UART","Port","1"));
@@ -439,23 +398,29 @@ void CgaoqingDlg::startUART()
 	ser_com->OpenListenThread();
 	ser_com->pWnd = this;
 }
-
+/*************************************************
+Function:   stopUART
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::stopUART()
 {
 	delete ser_com;
 
 }
-char CgaoqingDlg::rx_ser[50]={};
-int  CgaoqingDlg::count_ser=0;
-int  CgaoqingDlg::longth_ser=0;
-char CgaoqingDlg::command_ser=0;
+/*************************************************
+Function:   ser_com_read
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::ser_com_read(char rd)
 {
 	if((rd == 0x02)||(rx_ser[0]==0x02))
 	{
-		//#ifdef TEST_PROCESS
-		//seb[sei++]=rd;sei%=500;
-		//#endif
 		switch (rd)
 		{
 		case 0x02:
@@ -549,10 +514,13 @@ void CgaoqingDlg::ser_com_read(char rd)
 		}
 	}
 }
-void CgaoqingDlg::OnOK(){
-
-	return;
-}
+/*************************************************
+Function:   Command_Disposal_Ser
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::Command_Disposal_Ser(char command)
 {
 	//unsigned int hour;
@@ -565,20 +533,6 @@ void CgaoqingDlg::Command_Disposal_Ser(char command)
 		else direction = 1;
 		dLogin.output_list_.ResetContent();
 		post_message(_T("列车到达...\r\n"));
-/*
-
-		if(camer_a && mHik_a->playliveHik(false) != FAIL){
-
-		}
-		if(camer_b && mHik_b->playliveHik(false) != FAIL){
-
-		}
-		if(camer_c && mHik_c->playliveHik(false) != FAIL){
-
-		}
-		if(camer_d && mHik_d->playliveHik(false) != FAIL){
-
-		}*/
 		playLive(false);
 
 		stime = timeGetTime();
@@ -617,7 +571,6 @@ void CgaoqingDlg::Command_Disposal_Ser(char command)
 		{
 			timename = "20"+CString(rx_ser+2,12);
 			foldername.Format(_T("%s%s"),path,timename);
-			//hour=(rx_ser[8]-0x30)*10+(rx_ser[9]-0x30);
 			_mkdir(foldername);
 			pFile = ::CreateFile(_T(foldername+"\\index.txt"),
 				GENERIC_WRITE,
@@ -631,21 +584,9 @@ void CgaoqingDlg::Command_Disposal_Ser(char command)
 			{  
 				AfxMessageBox("Invalid handle when read file create/n");  
 			}else{
-
-				//rs_train.AddNew();
-				//rs_train.tran_name = timename; 
 				CString sql;
 				sql.Format( _T("INSERT INTO tbl_train (tran_name) VALUES (\'%s\')"),timename);
 					
-					
-					
-					//%d\r\n%d\t%d\t%s\t%d\tJ\r\n",direction,car_n,car_speed,CString(car_number,20),pos);
-
-				//CString sql = _T("INSERT UserInfo(tran_name)VALUES(" 123, 'Bob');
-
-				//try{   
-				//rs_train.Open();
-				//rs_train.AddNew();
 				m_db.ExecuteSQL(sql);
 				CString train_sql = _T("SELECT top 1 tran_id from tbl_train order by tran_id desc");
 				TRY        
@@ -665,14 +606,6 @@ void CgaoqingDlg::Command_Disposal_Ser(char command)
 					AfxMessageBox(_T("memory exception"));     
 				}  
 				END_CATCH  
-				//rs_train.Update();
-				//}
-
-
-				//if(!rs_train.Update())  
-				//{  
-				//	AfxMessageBox(_T("Add New failed!"));  
-				//}  
 
 			}
 
@@ -708,18 +641,14 @@ void CgaoqingDlg::Command_Disposal_Ser(char command)
 			if(rx_ser[4]==0x03?1:0) car_n=(rx_ser[3]-0x30)+(rx_ser[2]-0x30)*10;
 			else car_n= (rx_ser[4]-0x30)+(rx_ser[3]-0x30)*10+ (rx_ser[2]-0x30)*100;
 
-			//post_message(_T("车位...%d\r\n"),car_n);
 			post_message(_T("%d---%s---%s\r\n"),car_speed,CString(car_number,7),CString(car_number+7,13));
 			if(car_n == 1) 
 			{
-				//str.Format("%d\r\n%d\t%d\t%s\t%d\tJ\r\n",direction,car_n,car_speed,CString(car_number,20),pos);
 				str.Format("%d\r\n%d\t%d\t%s\t%d\tJ\r\n",direction,car_n,car_speed,CString(car_number,20),pos);
 
 			}
 			else 
 			{
-				//str.Format("%d\t%d\t%s\t%d\t \r\n",car_n,car_speed,CString(car_number,20),pos);
-
 				if(car_n == 5) {
 					int re=0;
 
@@ -768,28 +697,20 @@ void CgaoqingDlg::Command_Disposal_Ser(char command)
 
 		tabSettings.EnableWindow(true);
 		if(camer_a){
-			//mHik_a->stopplaybackHik();
 			mHik_a->stopsavefileHik();
 			mHik_a->stopplayliveHik();
-			//mHik_a->stopplaybackHik();
 		}
 		if(camer_b){
-			//mHik_b->stopplaybackHik();
 			mHik_b->stopsavefileHik();
 			mHik_b->stopplayliveHik();
-			//mHik_b->stopplaybackHik();
 		}
 		if(camer_c){
-			//mHik_c->stopplaybackHik();
 			mHik_c->stopsavefileHik();
 			mHik_c->stopplayliveHik();
-			//mHik_c->stopplaybackHik();
 		}
 		if(camer_d){
-			//mHik_d->stopplaybackHik();
 			mHik_d->stopsavefileHik();
 			mHik_d->stopplayliveHik();
-			//mHik_d->stopplaybackHik();
 		}
 
 		rs_train.Close();
@@ -837,6 +758,13 @@ void CgaoqingDlg::Command_Disposal_Ser(char command)
 		break;
 	}
 }
+/*************************************************
+Function:   getSize
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 CRect CgaoqingDlg::getSize(CWnd *pWnd)
 {
 	CRect rect;
@@ -844,6 +772,13 @@ CRect CgaoqingDlg::getSize(CWnd *pWnd)
 	ScreenToClient(&rect);
 	return rect;
 }
+/*************************************************
+Function:   saveSize
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::saveSize()
 {
 
@@ -868,6 +803,13 @@ void CgaoqingDlg::saveSize()
 	pWnd = GetDlgItem(IDC_BUTTON_REC_SLOW);  
 	screenSlow = getSize(pWnd); 
 }
+/*************************************************
+Function:   restoreSize
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::restoreSize()
 {
 	CWnd *pWnd;   
@@ -903,17 +845,19 @@ void CgaoqingDlg::restoreSize()
 	ChangeSize(pWnd, screenSlow.left, screenSlow.top,screenSlow.right-screenSlow.left,screenSlow.bottom-screenSlow.top);
 	
 }
+/*************************************************
+Function:   ChangeSize
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 CRect CgaoqingDlg::ChangeSize(CWnd *pWnd, int left, int top, int width, int height)  
 {  
 	if(pWnd)  //判断是否为空，因为对话框创建时会调用此函数，而当时控件还未创建   
 	{  
 		CRect old_rect,new_rect;   //获取控件变化前的大小  
 		old_rect = getSize(pWnd);
-		//pWnd->GetWindowRect(&old_rect);  
-		//ScreenToClient(&old_rect);//将控件大小转换为在对话框中的区域坐标   
-		//rect.left=rect.left*cx/m_rect.Width();//调整控件大小  
-		//rect.right=rect.right*cx/m_rect.Width();  
-		//rect.bottom=rect.bottom*cy/m_rect.Height();  
 		new_rect.left=left;//调整控件大小  
 		new_rect.right=left+width;  
 		new_rect.top=top;  
@@ -923,9 +867,13 @@ CRect CgaoqingDlg::ChangeSize(CWnd *pWnd, int left, int top, int width, int heig
 	}  
 	return NULL;
 } 
-//afx_msg void OnSysCommand(UINT nID, LPARAM lParam)
-
-
+/*************************************************
+Function:   getVideoTime
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 
 DWORD CgaoqingDlg::getVideoTime(bool isRec)
 {
@@ -968,6 +916,13 @@ DWORD CgaoqingDlg::getVideoTime(bool isRec)
 
 	return len;
 }
+/*************************************************
+Function:   getPlayedTime
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 DWORD CgaoqingDlg::getPlayedTime(bool isRec)
 {
 	DWORD len=0;
@@ -981,6 +936,13 @@ DWORD CgaoqingDlg::getPlayedTime(bool isRec)
 		return mHik_d->playedtimeHik();
 	return 0;
 }
+/*************************************************
+Function:   playVideoPos
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 int CgaoqingDlg::playVideoPos(DWORD pos)
 {
 	if(
@@ -992,6 +954,13 @@ int CgaoqingDlg::playVideoPos(DWORD pos)
 	}
 	return FAIL;
 }
+/*************************************************
+Function:   playLive
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 int CgaoqingDlg::playLive(bool display)
 {
 	if(
@@ -1018,6 +987,13 @@ int CgaoqingDlg::playLive(bool display)
 	}
 	return FAIL;
 }
+/*************************************************
+Function:   stopVideo
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 int CgaoqingDlg::stopVideo(bool isRec)
 {
 	if(
@@ -1029,6 +1005,13 @@ int CgaoqingDlg::stopVideo(bool isRec)
 	}
 	return FAIL;
 }
+/*************************************************
+Function:   resumeVideo
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 int CgaoqingDlg::resumeVideo()
 {
 	if(
@@ -1042,6 +1025,13 @@ int CgaoqingDlg::resumeVideo()
 	
 	return FAIL;
 }
+/*************************************************
+Function:   pauseVideo
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 int CgaoqingDlg::pauseVideo()
 {
 	if(
@@ -1055,6 +1045,13 @@ int CgaoqingDlg::pauseVideo()
 	
 	return FAIL;
 }
+/*************************************************
+Function:   fastVideo
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 int CgaoqingDlg::fastVideo()
 {
 	if(
@@ -1072,6 +1069,13 @@ int CgaoqingDlg::fastVideo()
 	
 	return FAIL;
 }
+/*************************************************
+Function:   slowVideo
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 int CgaoqingDlg::slowVideo()
 {
 	if(
@@ -1089,6 +1093,13 @@ int CgaoqingDlg::slowVideo()
 	
 	return FAIL;
 }
+/*************************************************
+Function:   saveParams
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 int CgaoqingDlg::saveParams(BYTE bright,BYTE contrast,BYTE sharpness,BYTE saturation,int exp_mode,int exp_time,int daynight)
 {
 	if(
@@ -1100,6 +1111,13 @@ int CgaoqingDlg::saveParams(BYTE bright,BYTE contrast,BYTE sharpness,BYTE satura
 	}else
 		return FAIL;
 }
+/*************************************************
+Function:   getParams
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 PARAM_STRU CgaoqingDlg::getParams()
 {
 	if(camer_a){
@@ -1116,9 +1134,16 @@ PARAM_STRU CgaoqingDlg::getParams()
 	}
 		//return (PARAM_STRU)null;
 }
-bool CgaoqingDlg::playVideo(CString patha,CString pathb,CString pathc,CString pathd)
+/*************************************************
+Function:   playVideo
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
+int CgaoqingDlg::playVideo(CString patha,CString pathb,CString pathc,CString pathd)
 {
-	bool result=FAIL;
+	int result=FAIL;
 	if(!patha.IsEmpty()){
 
 		mHik_a->rec = true;
@@ -1163,6 +1188,13 @@ bool CgaoqingDlg::playVideo(CString patha,CString pathb,CString pathc,CString pa
 
 	return result;
 }
+/*************************************************
+Function:   post_message
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::post_message(LPCTSTR format, ...)
 {
 	if (dLogin.output_list_)
@@ -1177,12 +1209,13 @@ void CgaoqingDlg::post_message(LPCTSTR format, ...)
 		dLogin.output_list_.SetCurSel(dLogin.output_list_.GetCount() - 1);
 	}
 }
-//================================11.5===========================================
-
-
-
-
-
+/*************************************************
+Function:   OnTcnSelchangeTab
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	int CurSel; 
@@ -1264,10 +1297,24 @@ void CgaoqingDlg::OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult)
 
 	*pResult = 0;
 }
+/*************************************************
+Function:   getCStringFromConfig
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 CString CgaoqingDlg::getCStringFromConfig(CString cam,CString sub)
 {
 	return _T(getConfig(cam,sub,""));
 }
+/*************************************************
+Function:   loginCamera
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 bool CgaoqingDlg::loginCamera()
 {
 	//UpdateData(TRUE);
@@ -1331,6 +1378,13 @@ bool CgaoqingDlg::loginCamera()
 	}
 	return re;
 }
+/*************************************************
+Function:   OnBnClickedButtonRecPlay
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::OnBnClickedButtonRecPlay()
 {
 	if (s_Play)
@@ -1355,7 +1409,13 @@ void CgaoqingDlg::OnBnClickedButtonRecPlay()
 		
 	}
 }
-
+/*************************************************
+Function:   OnBnClickedButtonRecFast
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::OnBnClickedButtonRecFast()
 {
 	if(playSpeed <4){
@@ -1399,7 +1459,13 @@ void CgaoqingDlg::OnBnClickedButtonRecFast()
 		}
 	}
 }
-
+/*************************************************
+Function:   OnBnClickedButtonRecSlow
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::OnBnClickedButtonRecSlow()
 {
 	if(playSpeed >-4){
@@ -1443,7 +1509,13 @@ void CgaoqingDlg::OnBnClickedButtonRecSlow()
 		}	
 	}
 }
-
+/*************************************************
+Function:   OnNMReleasedcaptureSliderPlay
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::OnNMReleasedcaptureSliderPlay(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	int nPos = 0;
@@ -1456,6 +1528,13 @@ void CgaoqingDlg::OnNMReleasedcaptureSliderPlay(NMHDR *pNMHDR, LRESULT *pResult)
 	adjust = false;
 	*pResult = 0;
 }
+/*************************************************
+Function:   logoutCamera
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::logoutCamera()
 {
 	if(camer_a && mHik_a->stopsavefileHik()==SUCCESS){
@@ -1506,6 +1585,13 @@ void CgaoqingDlg::logoutCamera()
 			
 	}
 }
+/*************************************************
+Function:   OnSysCommand
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if (nID == SC_RESTORE)
@@ -1518,71 +1604,16 @@ void CgaoqingDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 	CDialog::OnSysCommand(nID, lParam);
 }
+/*************************************************
+Function:   OnSize
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialog::OnSize(nType, cx, cy);
-/*
-	if(maxScreen){
-
-		if(nType==SIZE_MAXIMIZED){
-
-			int id;
-			CWnd *pWnd;
-			pWnd = GetDlgItem(IDC_STATIC_PLAY_A); 
-			pWnd->ShowWindow(SW_HIDE);
-			pWnd = GetDlgItem(IDC_STATIC_PLAY_B); 
-			pWnd->ShowWindow(SW_HIDE);
-			pWnd = GetDlgItem(IDC_STATIC_PLAY_C); 
-			pWnd->ShowWindow(SW_HIDE);
-			pWnd = GetDlgItem(IDC_STATIC_PLAY_D); 
-			pWnd->ShowWindow(SW_HIDE);
-
-			switch(maxScreen)
-			{
-				case 1:
-					id = IDC_STATIC_PLAY_A;  
-					
-					break;
-				case 2:
-					id = IDC_STATIC_PLAY_B;
-					break;
-				case 3:
-					id = IDC_STATIC_PLAY_C;
-					break;
-				case 4:
-					id = IDC_STATIC_PLAY_D;
-					break;
-				default:
-					id = IDC_STATIC_PLAY_A;
-					break;
-			
-			}
-			   
-			pWnd = GetDlgItem(id);  
-			pWnd->ShowWindow(SW_SHOW);
-			screenMax = ChangeSize(pWnd, cx*0.01, cy*0.01,cx*0.98,cy*0.94); 
-
-
-
-
-
-
-
-
-			pWnd = GetDlgItem(IDC_SLIDER_PLAY);  
-			screenProcess = ChangeSize(pWnd, cx*0.01, cy*0.96,cx*0.70,cy*0.03); 
-
-			pWnd = GetDlgItem(IDC_BUTTON_REC_PLAY);  
-			screenPlay = ChangeSize(pWnd, cx*0.73, cy*0.96,cx*0.08,cy*0.03); 
-			pWnd = GetDlgItem(IDC_BUTTON_REC_FAST);  
-			screenFast = ChangeSize(pWnd, cx*0.82, cy*0.96,cx*0.08,cy*0.03); 
-			pWnd = GetDlgItem(IDC_BUTTON_REC_SLOW);  
-			screenSlow = ChangeSize(pWnd, cx*0.91, cy*0.96,cx*0.08,cy*0.03); 
-
-
-		
-		}
-	}else{*/
 		if(nType==SIZE_MAXIMIZED){
 			if(!maxScreen){
 		tabSettings.ShowWindow(SW_HIDE);
@@ -1635,7 +1666,13 @@ void CgaoqingDlg::OnSize(UINT nType, int cx, int cy)
 	//}
 	// TODO: Add your message handler code here
 }
-
+/*************************************************
+Function:   OnStnDblclickStaticPlayA
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::OnStnDblclickStaticPlayA()
 {
 	// TODO: Add your control notification handler code here
@@ -1681,7 +1718,13 @@ void CgaoqingDlg::OnStnDblclickStaticPlayA()
 		//pWnd->ModifyStyle(0,SS_NOTIFY);
 	}
 }
-
+/*************************************************
+Function:   OnStnDblclickStaticPlayB
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::OnStnDblclickStaticPlayB()
 {
 	// TODO: Add your control notification handler code here
@@ -1726,7 +1769,13 @@ void CgaoqingDlg::OnStnDblclickStaticPlayB()
 
 	}
 }
-
+/*************************************************
+Function:   OnStnDblclickStaticPlayC
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::OnStnDblclickStaticPlayC()
 {
 	// TODO: Add your control notification handler code here
@@ -1771,7 +1820,13 @@ void CgaoqingDlg::OnStnDblclickStaticPlayC()
 
 	}
 }
-
+/*************************************************
+Function:   OnStnDblclickStaticPlayD
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::OnStnDblclickStaticPlayD()
 {
 	// TODO: Add your control notification handler code here
@@ -1790,7 +1845,6 @@ void CgaoqingDlg::OnStnDblclickStaticPlayD()
 
 		pWnd = GetDlgItem(IDC_STATIC_PLAY_D);  
 		ChangeSize(pWnd, screenMax.left, screenMax.top,screenMax.right-screenMax.left,screenMax.bottom-screenMax.top);  
-		//pWnd->ModifyStyle(SS_NOTIFY,0);
 		ModifyStyle(0,WS_MAXIMIZEBOX|WS_MINIMIZEBOX);
 	}else{
 		maxScreen = 1;
@@ -1803,8 +1857,6 @@ void CgaoqingDlg::OnStnDblclickStaticPlayD()
 		pWnd->ShowWindow(SW_HIDE);
 		pWnd = GetDlgItem(IDC_STATIC_PLAY_C);   
 		pWnd->ShowWindow(SW_HIDE);
-		//pWnd = GetDlgItem(IDC_STATIC_PLAY_D);  
-		//pWnd->ShowWindow(SW_HIDE);
 
 		CRect rt;
 		GetClientRect(&rt);
@@ -1816,7 +1868,13 @@ void CgaoqingDlg::OnStnDblclickStaticPlayD()
 
 	}
 }
-
+/*************************************************
+Function:   OnTimer
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
@@ -1827,7 +1885,13 @@ void CgaoqingDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 	CDialog::OnTimer(nIDEvent);
 }
-
+/*************************************************
+Function:   ShowLivePlayBackState
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CgaoqingDlg::ShowLivePlayBackState()
 {
 	DWORD len =	getVideoTime(false)*1000;
@@ -1837,15 +1901,6 @@ void CgaoqingDlg::ShowLivePlayBackState()
 	}
 
 	DWORD nCurTime=getPlayedTime(false);
-	//post_message(_T("%d-%d\r\n"),len,nCurTime);
-	//parent->playslider.SetPos(nCurTime);
-	/*CString csStatus;
-	csStatus.Format("%02d:%02d:%02d/%02d:%02d:%02d",\
-		nCurSecond/3600,(nCurSecond%3600)/60,nCurSecond%60,\
-		m_iTotalSeconds/3600,(m_iTotalSeconds%3600)/60,m_iTotalSeconds%60);
-	float fCurPos = PlayM4_GetPlayPos(USED_PORT);
-	g_pMainDlg->AddLog(m_iDeviceIndex, OPERATION_SUCC_T, "PlayM4_GetPlayPos %f", fCurPos);
-	*/
 	if (nCurTime > len-100)
 	{
 		stopVideo(false);
@@ -1859,12 +1914,7 @@ void CgaoqingDlg::ShowLivePlayBackState()
 		wd->SetBitmap(NULL);
 		Invalidate(TRUE);
 
-
 		playLive(true);
-
-
-		//GetDlgItem(IDC_BUTTON_REC_PLAY)->SetWindowText("播放");
-		//OnBnClickedBtnLocalStop();
 		KillTimer(LIVE_TIMER);
 
 	}
@@ -1872,22 +1922,14 @@ void CgaoqingDlg::ShowLivePlayBackState()
 
 	//GetDlgItem(IDC_STATIC_LOCAL_PLAY_STATUS)->SetWindowText(csStatus);
 }
+/*************************************************
+Function:   OnOK
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
+void CgaoqingDlg::OnOK(){
 
-/*
-void CgaoqingDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
-{
-	// TODO: Add your message handler code here and/or call default
-switch (nSBCode)
-	{
-	case TB_THUMBTRACK: 
-		if (pScrollBar->GetSafeHwnd() == playslider.GetSafeHwnd())//如果拖动的是滑块
-		{
-			CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
-		}
-		break;
-	default:
-		return;
-	}
-
-	
-}*/
+	return;
+}

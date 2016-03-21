@@ -1,3 +1,8 @@
+/*
+File name:   DialogFind.h
+File Author: Li Weichen
+Date:        2016.3.1
+*/
 #pragma once
 #include "afxcmn.h"
 #include "afxdb.h"
@@ -27,44 +32,42 @@ public:
 // Dialog Data
 	enum { IDD = IDD_DIALOG_FIND };
 
-	void findTrains(CString sql,CString carno);
+	//===== member variables ====
+	CTreeCtrl tran_list;
+	CgaoqingDlg *parent;
+	CDateTimeCtrl startTime;
+	CDateTimeCtrl endTime;
+	CEdit mEditCarNo;
+	//===== db variables ====
 	CDatabase m_db; 
 	CRecordset rs_train,rs_details;
+
+	//===== tree list variables =====
 	HTREEITEM hRoot;     // 树的根节点的句柄   
-    HTREEITEM hCataItem; // 可表示任一分类节点的句柄   
-    HTREEITEM hArtItem;  // 可表示任一文章节点的句柄 
+    HTREEITEM hCataItem; // 可表示任一日期节点的句柄   
+    HTREEITEM hArtItem;  // 可表示任一车厢节点的句柄 
+
+	//===== message fuction =====
 	void OnOK();
-private:
-	DWORD len;
+
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedButtonFind();
+	afx_msg void OnNMDblclkTrainList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+
+	//===== member function ====
+	void findTrains(CString sql,CString carno);
+
 	
 
 
-
+private:
+	//===== member variables ====
+	DWORD len;//play length
 	
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	vector<CAR_NO> findCars(CString uri);
 	DECLARE_MESSAGE_MAP()
-public:
-	CTreeCtrl tran_list;
-	CgaoqingDlg *parent;
-public:
-	afx_msg void OnTvnSelchangedTrainList(NMHDR *pNMHDR, LRESULT *pResult);
-public:
-	afx_msg void OnTvnGetInfoTipTrainList(NMHDR *pNMHDR, LRESULT *pResult);
 
-public:
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
-public:
-	afx_msg void OnBnClickedButtonFind();
-public:
-	CDateTimeCtrl startTime;
-public:
-	CDateTimeCtrl endTime;
-public:
-	CEdit mEditCarNo;
-public:
-	afx_msg void OnNMDblclkTrainList(NMHDR *pNMHDR, LRESULT *pResult);
-public:
-	afx_msg void OnSize(UINT nType, int cx, int cy);
+
 };

@@ -1,11 +1,12 @@
-// DialogSetting.cpp : implementation file
-//
-
+/*
+File name:   DialogSetting.cpp
+File Author: Li Weichen
+Date:        2016.3.1
+*/
 #include "stdafx.h"
 #include "gaoqing.h"
 #include "DialogSetting.h"
 #include "gaoqingDlg.h"
-
 // CDialogSetting dialog
 
 IMPLEMENT_DYNAMIC(CDialogSetting, CDialog)
@@ -16,6 +17,85 @@ CDialogSetting::CDialogSetting(CWnd* pParent /*=NULL*/)
 
 
 }
+CDialogSetting::~CDialogSetting()
+{
+}
+
+void CDialogSetting::DoDataExchange(CDataExchange* pDX)
+{
+	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_BRIGHTNESS, c_Brightness);
+	DDX_Control(pDX, IDC_CONTRAST, c_Contrast);
+	DDX_Control(pDX, IDC_SHARPNESS, c_Sharpness);
+	DDX_Control(pDX, IDC_SATURATION, c_Saturation);
+	DDX_Control(pDX, IDC_EXP_MODE, c_ExpMode);
+	DDX_Control(pDX, IDC_EXP_TIME, c_ExpTime);
+	DDX_Control(pDX, IDC_DAYNIGHT, c_DayNight);
+
+	DDX_Control(pDX, IDC_IPADDRESS_A, ip_a);
+	DDX_Text(pDX, IDC_EDIT_PORT_A, port_a);
+	DDX_Text(pDX, IDC_EDIT_PWD_A, pwd_a);
+	DDX_Text(pDX, IDC_EDIT_USER_A, user_a);
+
+	DDX_Control(pDX, IDC_IPADDRESS_B, ip_b);
+	DDX_Text(pDX, IDC_EDIT_PORT_B, port_b);
+	DDX_Text(pDX, IDC_EDIT_PWD_B, pwd_b);
+	DDX_Text(pDX, IDC_EDIT_USER_B, user_b);
+
+	DDX_Control(pDX, IDC_IPADDRESS_C, ip_c);
+	DDX_Text(pDX, IDC_EDIT_PORT_C, port_c);
+	DDX_Text(pDX, IDC_EDIT_PWD_C, pwd_c);
+	DDX_Text(pDX, IDC_EDIT_USER_C, user_c);
+
+	DDX_Control(pDX, IDC_IPADDRESS_D, ip_d);
+	DDX_Text(pDX, IDC_EDIT_PORT_D, port_d);
+	DDX_Text(pDX, IDC_EDIT_PWD_D, pwd_d);
+	DDX_Text(pDX, IDC_EDIT_USER_D, user_d);
+
+	DDX_Control(pDX, IDC_CHECK_A, isAExist);
+	DDX_Control(pDX, IDC_CHECK_B, isBExist);
+	DDX_Control(pDX, IDC_CHECK_C, isCExist);
+	DDX_Control(pDX, IDC_CHECK_D, isDExist);
+	DDX_Control(pDX, IDC_BUTTON_LOGIN, loginSet);
+	DDX_Control(pDX, IDC_EDIT2, passwordInput);
+}
+
+
+BEGIN_MESSAGE_MAP(CDialogSetting, CDialog)
+
+
+
+
+	ON_BN_CLICKED(IDC_CHECK_A, &CDialogSetting::OnCameraACheck)
+	ON_BN_CLICKED(IDC_CHECK_B, &CDialogSetting::OnCameraBCheck)
+	ON_BN_CLICKED(IDC_CHECK_C, &CDialogSetting::OnCameraCCheck)
+	ON_BN_CLICKED(IDC_CHECK_D, &CDialogSetting::OnCameraDCheck)
+	ON_NOTIFY(IPN_FIELDCHANGED, IDC_IPADDRESS_A, &CDialogSetting::OnIpnFieldchangedIpaddressA)
+	ON_NOTIFY(IPN_FIELDCHANGED, IDC_IPADDRESS_C, &CDialogSetting::OnIpnFieldchangedIpaddressC)
+	ON_NOTIFY(IPN_FIELDCHANGED, IDC_IPADDRESS_B, &CDialogSetting::OnIpnFieldchangedIpaddressB)
+	ON_NOTIFY(IPN_FIELDCHANGED, IDC_IPADDRESS_D, &CDialogSetting::OnIpnFieldchangedIpaddressD)
+	ON_EN_CHANGE(IDC_EDIT_PORT_A, &CDialogSetting::OnEnChangeEditPortA)
+	ON_EN_CHANGE(IDC_EDIT_PORT_B, &CDialogSetting::OnEnChangeEditPortB)
+	ON_EN_CHANGE(IDC_EDIT_PORT_C, &CDialogSetting::OnEnChangeEditPortC)
+	ON_EN_CHANGE(IDC_EDIT_PORT_D, &CDialogSetting::OnEnChangeEditPortD)
+	ON_EN_CHANGE(IDC_EDIT_USER_A, &CDialogSetting::OnEnChangeEditUserA)
+	ON_EN_CHANGE(IDC_EDIT_PWD_A, &CDialogSetting::OnEnChangeEditPwdA)
+	ON_EN_CHANGE(IDC_EDIT_USER_C, &CDialogSetting::OnEnChangeEditUserC)
+	ON_EN_CHANGE(IDC_EDIT_PWD_C, &CDialogSetting::OnEnChangeEditPwdC)
+	ON_EN_CHANGE(IDC_EDIT_USER_B, &CDialogSetting::OnEnChangeEditUserB)
+	ON_EN_CHANGE(IDC_EDIT_PWD_B, &CDialogSetting::OnEnChangeEditPwdB)
+	ON_EN_CHANGE(IDC_EDIT_USER_D, &CDialogSetting::OnEnChangeEditUserD)
+	ON_EN_CHANGE(IDC_EDIT_PWD_D, &CDialogSetting::OnEnChangeEditPwdD)
+	ON_BN_CLICKED(IDC_BUTTON_LOGIN, &CDialogSetting::OnBnClickedButtonLogin)
+	ON_WM_VSCROLL()
+	ON_WM_MOUSEWHEEL()
+END_MESSAGE_MAP()
+/*************************************************
+Function:   getCStringFromConfig
+Desc:	    获得配置文件中的配置信息
+Input:      CString cam 主键 CString sub 子键
+Return:		CString 被配置的字符串
+**************************************************/
 CString CDialogSetting::getCStringFromConfig(CString cam,CString sub)
 {
 	CgaoqingDlg *dlg = (CgaoqingDlg *)GetParent()->GetParent();
@@ -23,27 +103,52 @@ CString CDialogSetting::getCStringFromConfig(CString cam,CString sub)
 
 	return str;
 }
+/*************************************************
+Function:   setCStringToConfig
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::setCStringToConfig(CString cam,CString sub,CString str)
 {
 	CgaoqingDlg *dlg = (CgaoqingDlg *)GetParent()->GetParent();
 	dlg->setConfig(cam,sub,str);
 
 }
+/*************************************************
+Function:   saveParams
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::saveParams(BYTE bright,BYTE contrast,BYTE sharpness,BYTE saturation,int exp_mode,int exp_time,int daynight)
 {
 	CgaoqingDlg *dlg = (CgaoqingDlg *)GetParent()->GetParent();
 	dlg->saveParams(bright,contrast,sharpness,saturation,exp_mode,exp_time,daynight);
 
 }
+/*************************************************
+Function:   getParams
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 PARAM_STRU CDialogSetting::getParams()
 {
 	CgaoqingDlg *dlg = (CgaoqingDlg *)GetParent()->GetParent();
 	return dlg->getParams();
 
 }
-CDialogSetting::~CDialogSetting()
-{
-}
+/*************************************************
+Function:   OnInitDialog
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 BOOL CDialogSetting::OnInitDialog()
 {
 	CDialog::OnInitDialog();
@@ -190,6 +295,13 @@ BOOL CDialogSetting::OnInitDialog()
 	return TRUE;  // return TRUE  unless you set the focus to a control
 
 }
+/*************************************************
+Function:   getIp
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 CString CDialogSetting::getIp()
 {
 	UpdateData(TRUE);
@@ -200,96 +312,21 @@ CString CDialogSetting::getIp()
 	DeviceIp.Format("%d.%d.%d.%d",nField0,nField1,nField2,nField3);
 	return DeviceIp;
 	
-}/*
-int CDialogSetting::getPort()
-{
-	return port_a;
-	
-}*/
-void CDialogSetting::DoDataExchange(CDataExchange* pDX)
-{
-	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_BRIGHTNESS, c_Brightness);
-	DDX_Control(pDX, IDC_CONTRAST, c_Contrast);
-	DDX_Control(pDX, IDC_SHARPNESS, c_Sharpness);
-	DDX_Control(pDX, IDC_SATURATION, c_Saturation);
-	DDX_Control(pDX, IDC_EXP_MODE, c_ExpMode);
-	DDX_Control(pDX, IDC_EXP_TIME, c_ExpTime);
-	DDX_Control(pDX, IDC_DAYNIGHT, c_DayNight);
-
-	DDX_Control(pDX, IDC_IPADDRESS_A, ip_a);
-	DDX_Text(pDX, IDC_EDIT_PORT_A, port_a);
-	DDX_Text(pDX, IDC_EDIT_PWD_A, pwd_a);
-	DDX_Text(pDX, IDC_EDIT_USER_A, user_a);
-
-	DDX_Control(pDX, IDC_IPADDRESS_B, ip_b);
-	DDX_Text(pDX, IDC_EDIT_PORT_B, port_b);
-	DDX_Text(pDX, IDC_EDIT_PWD_B, pwd_b);
-	DDX_Text(pDX, IDC_EDIT_USER_B, user_b);
-
-	DDX_Control(pDX, IDC_IPADDRESS_C, ip_c);
-	DDX_Text(pDX, IDC_EDIT_PORT_C, port_c);
-	DDX_Text(pDX, IDC_EDIT_PWD_C, pwd_c);
-	DDX_Text(pDX, IDC_EDIT_USER_C, user_c);
-
-	DDX_Control(pDX, IDC_IPADDRESS_D, ip_d);
-	DDX_Text(pDX, IDC_EDIT_PORT_D, port_d);
-	DDX_Text(pDX, IDC_EDIT_PWD_D, pwd_d);
-	DDX_Text(pDX, IDC_EDIT_USER_D, user_d);
-
-	DDX_Control(pDX, IDC_CHECK_A, isAExist);
-	DDX_Control(pDX, IDC_CHECK_B, isBExist);
-	DDX_Control(pDX, IDC_CHECK_C, isCExist);
-	DDX_Control(pDX, IDC_CHECK_D, isDExist);
-	DDX_Control(pDX, IDC_BUTTON_LOGIN, loginSet);
-	DDX_Control(pDX, IDC_EDIT2, passwordInput);
 }
-
-
-BEGIN_MESSAGE_MAP(CDialogSetting, CDialog)
-	ON_BN_CLICKED(IDC_BUTTON_SAVE, &CDialogSetting::OnBnClickedButtonSave)
-	ON_CBN_SELCHANGE(IDC_CONTRAST, &CDialogSetting::OnCbnSelchangeContrast)
-	ON_CBN_SELCHANGE(IDC_SHARPNESS, &CDialogSetting::OnCbnSelchangeSharpness)
-	ON_CBN_SELCHANGE(IDC_SATURATION, &CDialogSetting::OnCbnSelchangeSaturation)
-	ON_CBN_SELCHANGE(IDC_EXP_MODE, &CDialogSetting::OnCbnSelchangeExpMode)
-	ON_CBN_SELCHANGE(IDC_EXP_TIME, &CDialogSetting::OnCbnSelchangeExpTime)
-	ON_CBN_SELCHANGE(IDC_DAYNIGHT, &CDialogSetting::OnCbnSelchangeDaynight)
-	ON_CBN_SELCHANGE(IDC_BRIGHTNESS, &CDialogSetting::OnCbnSelchangeBrightness)
-
-
-
-
-	ON_BN_CLICKED(IDC_CHECK_A, &CDialogSetting::OnCameraACheck)
-	ON_BN_CLICKED(IDC_CHECK_B, &CDialogSetting::OnCameraBCheck)
-	ON_BN_CLICKED(IDC_CHECK_C, &CDialogSetting::OnCameraCCheck)
-	ON_BN_CLICKED(IDC_CHECK_D, &CDialogSetting::OnCameraDCheck)
-	ON_NOTIFY(IPN_FIELDCHANGED, IDC_IPADDRESS_A, &CDialogSetting::OnIpnFieldchangedIpaddressA)
-	ON_NOTIFY(IPN_FIELDCHANGED, IDC_IPADDRESS_C, &CDialogSetting::OnIpnFieldchangedIpaddressC)
-	ON_NOTIFY(IPN_FIELDCHANGED, IDC_IPADDRESS_B, &CDialogSetting::OnIpnFieldchangedIpaddressB)
-	ON_NOTIFY(IPN_FIELDCHANGED, IDC_IPADDRESS_D, &CDialogSetting::OnIpnFieldchangedIpaddressD)
-	ON_EN_CHANGE(IDC_EDIT_PORT_A, &CDialogSetting::OnEnChangeEditPortA)
-	ON_EN_CHANGE(IDC_EDIT_PORT_B, &CDialogSetting::OnEnChangeEditPortB)
-	ON_EN_CHANGE(IDC_EDIT_PORT_C, &CDialogSetting::OnEnChangeEditPortC)
-	ON_EN_CHANGE(IDC_EDIT_PORT_D, &CDialogSetting::OnEnChangeEditPortD)
-	ON_EN_CHANGE(IDC_EDIT_USER_A, &CDialogSetting::OnEnChangeEditUserA)
-	ON_EN_CHANGE(IDC_EDIT_PWD_A, &CDialogSetting::OnEnChangeEditPwdA)
-	ON_EN_CHANGE(IDC_EDIT_USER_C, &CDialogSetting::OnEnChangeEditUserC)
-	ON_EN_CHANGE(IDC_EDIT_PWD_C, &CDialogSetting::OnEnChangeEditPwdC)
-	ON_EN_CHANGE(IDC_EDIT_USER_B, &CDialogSetting::OnEnChangeEditUserB)
-	ON_EN_CHANGE(IDC_EDIT_PWD_B, &CDialogSetting::OnEnChangeEditPwdB)
-	ON_EN_CHANGE(IDC_EDIT_USER_D, &CDialogSetting::OnEnChangeEditUserD)
-	ON_EN_CHANGE(IDC_EDIT_PWD_D, &CDialogSetting::OnEnChangeEditPwdD)
-	ON_BN_CLICKED(IDC_BUTTON_LOGIN, &CDialogSetting::OnBnClickedButtonLogin)
-	ON_WM_VSCROLL()
-	ON_WM_MOUSEWHEEL()
-END_MESSAGE_MAP()
+/*************************************************
+Function:   SplitCString
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 vector<CString> CDialogSetting::SplitCString(CString strSource, CString ch)
 {
-      vector<CString> vecString;
-      int iPos = 0;
-      CString strTmp;
-	  strSource.ReleaseBuffer();
-      strTmp = strSource.Tokenize(ch,iPos);
+	vector<CString> vecString;
+	int iPos = 0;
+	CString strTmp;
+	strSource.ReleaseBuffer();
+	strTmp = strSource.Tokenize(ch,iPos);
 	while(strTmp.Trim() != _T(""))
 	{
 		vecString.push_back(strTmp);
@@ -297,10 +334,24 @@ vector<CString> CDialogSetting::SplitCString(CString strSource, CString ch)
 	}
 	return vecString;
 }
+/*************************************************
+Function:   OnOK
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnOK(){
 
 	return;
 }
+/*************************************************
+Function:   transCStringToInt
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 int CDialogSetting::transCStringToInt(CString addstr)
 {
 	DWORD add;
@@ -309,7 +360,14 @@ int CDialogSetting::transCStringToInt(CString addstr)
 
 	return add;
 }
-#include "gaoqingDlg.h"
+
+/*************************************************
+Function:   OnCameraACheck
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnCameraACheck()
 {
 	parent->camer_a = isAExist.GetCheck();
@@ -329,7 +387,13 @@ void CDialogSetting::OnCameraACheck()
 	}
 
 }
-
+/*************************************************
+Function:   OnCameraBCheck
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnCameraBCheck()
 {
 	parent->camer_b = isBExist.GetCheck();
@@ -348,7 +412,13 @@ void CDialogSetting::OnCameraBCheck()
 		GetDlgItem(IDC_EDIT_PWD_B)-> EnableWindow(false);
 	}
 }
-
+/*************************************************
+Function:   OnCameraCCheck
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnCameraCCheck()
 {
 	parent->camer_c = isCExist.GetCheck();
@@ -367,7 +437,13 @@ void CDialogSetting::OnCameraCCheck()
 		GetDlgItem(IDC_EDIT_PWD_C)-> EnableWindow(false);
 	}
 }
-
+/*************************************************
+Function:   OnCameraDCheck
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnCameraDCheck()
 {
 	parent->camer_d = isDExist.GetCheck();
@@ -387,8 +463,13 @@ void CDialogSetting::OnCameraDCheck()
 		GetDlgItem(IDC_EDIT_PWD_D)-> EnableWindow(false);
 	}
 }
-
-
+/*************************************************
+Function:   OnIpnFieldchangedIpaddressA
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnIpnFieldchangedIpaddressA(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMIPADDRESS pIPAddr = reinterpret_cast<LPNMIPADDRESS>(pNMHDR);
@@ -403,7 +484,13 @@ void CDialogSetting::OnIpnFieldchangedIpaddressA(NMHDR *pNMHDR, LRESULT *pResult
 
 	setCStringToConfig("CAMA","Ip",DeviceIp);
 }
-
+/*************************************************
+Function:   OnIpnFieldchangedIpaddressC
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnIpnFieldchangedIpaddressC(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMIPADDRESS pIPAddr = reinterpret_cast<LPNMIPADDRESS>(pNMHDR);
@@ -417,7 +504,13 @@ void CDialogSetting::OnIpnFieldchangedIpaddressC(NMHDR *pNMHDR, LRESULT *pResult
 
 	setCStringToConfig("CAMC","Ip",DeviceIp);
 }
-
+/*************************************************
+Function:   OnIpnFieldchangedIpaddressB
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnIpnFieldchangedIpaddressB(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMIPADDRESS pIPAddr = reinterpret_cast<LPNMIPADDRESS>(pNMHDR);
@@ -431,7 +524,13 @@ void CDialogSetting::OnIpnFieldchangedIpaddressB(NMHDR *pNMHDR, LRESULT *pResult
 
 	setCStringToConfig("CAMB","Ip",DeviceIp);
 }
-
+/*************************************************
+Function:   OnIpnFieldchangedIpaddressD
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnIpnFieldchangedIpaddressD(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMIPADDRESS pIPAddr = reinterpret_cast<LPNMIPADDRESS>(pNMHDR);
@@ -445,6 +544,13 @@ void CDialogSetting::OnIpnFieldchangedIpaddressD(NMHDR *pNMHDR, LRESULT *pResult
 
 	setCStringToConfig("CAMD","Ip",DeviceIp);
 }
+/*************************************************
+Function:   OnEnChangeEditPortA
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnEnChangeEditPortA()
 {
 	UpdateData(TRUE);
@@ -452,7 +558,13 @@ void CDialogSetting::OnEnChangeEditPortA()
 	str.Format("%d", port_a);
 	setCStringToConfig("CAMA","Port",str);
 }
-
+/*************************************************
+Function:   OnEnChangeEditPortB
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnEnChangeEditPortB()
 {
 	UpdateData(TRUE);
@@ -460,7 +572,13 @@ void CDialogSetting::OnEnChangeEditPortB()
 	str.Format("%d", port_b);
 	setCStringToConfig("CAMB","Port",str);
 }
-
+/*************************************************
+Function:   OnEnChangeEditPortC
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnEnChangeEditPortC()
 {
 	UpdateData(TRUE);
@@ -468,7 +586,13 @@ void CDialogSetting::OnEnChangeEditPortC()
 	str.Format("%d", port_c);
 	setCStringToConfig("CAMC","Port",str);
 }
-
+/*************************************************
+Function:   OnEnChangeEditPortD
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnEnChangeEditPortD()
 {
 	UpdateData(TRUE);
@@ -476,149 +600,181 @@ void CDialogSetting::OnEnChangeEditPortD()
 	str.Format("%d", port_d);
 	setCStringToConfig("CAMD","Port",str);
 }
-
+/*************************************************
+Function:   OnEnChangeEditUserA
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnEnChangeEditUserA()
 {
 	UpdateData(TRUE);
 	setCStringToConfig("CAMA","User",user_d);
 }
-
+/*************************************************
+Function:   OnEnChangeEditPwdA
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnEnChangeEditPwdA()
 {
 	UpdateData(TRUE);
 	setCStringToConfig("CAMA","Password",pwd_d);
 }
-
+/*************************************************
+Function:   OnEnChangeEditUserC
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnEnChangeEditUserC()
 {
 	UpdateData(TRUE);
 	setCStringToConfig("CAMC","User",user_d);
 }
-
+/*************************************************
+Function:   OnEnChangeEditPwdC
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnEnChangeEditPwdC()
 {
 	UpdateData(TRUE);
 	setCStringToConfig("CAMC","Password",pwd_d);
 }
-
+/*************************************************
+Function:   OnEnChangeEditUserB
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnEnChangeEditUserB()
 {
 	UpdateData(TRUE);
 	setCStringToConfig("CAMB","User",user_d);
 }
-
+/*************************************************
+Function:   OnEnChangeEditPwdB
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnEnChangeEditPwdB()
 {
 	UpdateData(TRUE);
 	setCStringToConfig("CAMB","Password",pwd_d);
 }
-
+/*************************************************
+Function:   OnEnChangeEditUserD
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnEnChangeEditUserD()
 {
 	UpdateData(TRUE);
 	setCStringToConfig("CAMD","User",user_d);
 }
-
+/*************************************************
+Function:   OnEnChangeEditPwdD
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnEnChangeEditPwdD()
 {
 	UpdateData(TRUE);
 	setCStringToConfig("CAMD","Password",pwd_d);
 }
-
-// CDialogSetting message handlers
+/*************************************************
+Function:   initParam
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::initParam()
 {
 
+	isAExist.SetCheck(parent->camer_a);OnCameraACheck();
+	isBExist.SetCheck(parent->camer_b);OnCameraBCheck();
+	isCExist.SetCheck(parent->camer_c);OnCameraCCheck();
+	isDExist.SetCheck(parent->camer_d);OnCameraDCheck();
 
-		isAExist.SetCheck(parent->camer_a);OnCameraACheck();
-		isBExist.SetCheck(parent->camer_b);OnCameraBCheck();
-		isCExist.SetCheck(parent->camer_c);OnCameraCCheck();
-		isDExist.SetCheck(parent->camer_d);OnCameraDCheck();
+	ip_a.SetAddress(transCStringToInt(getCStringFromConfig("CAMA","Ip")));
+	user_a=getCStringFromConfig("CAMA","User");//"admin";
+	pwd_a=getCStringFromConfig("CAMA","Password");//"admin123";
+	port_a=atoi(getCStringFromConfig("CAMA","Port"));//8000;
 
+	ip_b.SetAddress(transCStringToInt(getCStringFromConfig("CAMB","Ip")));
+	user_b=getCStringFromConfig("CAMB","User");//"admin";
+	pwd_b=getCStringFromConfig("CAMB","Password");//"admin123";
+	port_b=atoi(getCStringFromConfig("CAMB","Port"));//8000;
 
+	ip_c.SetAddress(transCStringToInt(getCStringFromConfig("CAMC","Ip")));
+	user_c=getCStringFromConfig("CAMC","User");//"admin";
+	pwd_c=getCStringFromConfig("CAMC","Password");//"admin123";
+	port_c=atoi(getCStringFromConfig("CAMC","Port"));//8000;
 
-		//ip_a.SetAddress(0xc0a877FB);
-		ip_a.SetAddress(transCStringToInt(getCStringFromConfig("CAMA","Ip")));
-		user_a=getCStringFromConfig("CAMA","User");//"admin";
-		pwd_a=getCStringFromConfig("CAMA","Password");//"admin123";
-		port_a=atoi(getCStringFromConfig("CAMA","Port"));//8000;
+	ip_d.SetAddress(transCStringToInt(getCStringFromConfig("CAMD","Ip")));
+	user_d=getCStringFromConfig("CAMD","User");//"admin";
+	pwd_d=getCStringFromConfig("CAMD","Password");//"admin123";
+	port_d=atoi(getCStringFromConfig("CAMD","Port"));//7000;
 
-		ip_b.SetAddress(transCStringToInt(getCStringFromConfig("CAMB","Ip")));
-		user_b=getCStringFromConfig("CAMB","User");//"admin";
-		pwd_b=getCStringFromConfig("CAMB","Password");//"admin123";
-		port_b=atoi(getCStringFromConfig("CAMB","Port"));//8000;
-
-		ip_c.SetAddress(transCStringToInt(getCStringFromConfig("CAMC","Ip")));
-		user_c=getCStringFromConfig("CAMC","User");//"admin";
-		pwd_c=getCStringFromConfig("CAMC","Password");//"admin123";
-		port_c=atoi(getCStringFromConfig("CAMC","Port"));//8000;
-
-		ip_d.SetAddress(transCStringToInt(getCStringFromConfig("CAMD","Ip")));
-		user_d=getCStringFromConfig("CAMD","User");//"admin";
-		pwd_d=getCStringFromConfig("CAMD","Password");//"admin123";
-		port_d=atoi(getCStringFromConfig("CAMD","Port"));//7000;
-
-		UpdateData(false);
+	UpdateData(false);
 
 
-
-
+	ip_a.EnableWindow(true);
+	ip_b.EnableWindow(true);
+	ip_c.EnableWindow(true);
+	ip_d.EnableWindow(true);
 
 
 
+	isAExist.EnableWindow(false);
+	isBExist.EnableWindow(false);
+	isCExist.EnableWindow(false);
+	isDExist.EnableWindow(false);
+
+	ip_a.EnableWindow(false);
+	GetDlgItem(IDC_EDIT_PORT_A)-> EnableWindow(false);
+	GetDlgItem(IDC_EDIT_USER_A)-> EnableWindow(false);
+	GetDlgItem(IDC_EDIT_PWD_A)-> EnableWindow(false);
+
+	ip_b.EnableWindow(false);
+	GetDlgItem(IDC_EDIT_PORT_B)-> EnableWindow(false);
+	GetDlgItem(IDC_EDIT_USER_B)-> EnableWindow(false);
+	GetDlgItem(IDC_EDIT_PWD_B)-> EnableWindow(false);
+
+	ip_c.EnableWindow(false);
+	GetDlgItem(IDC_EDIT_PORT_C)-> EnableWindow(false);
+	GetDlgItem(IDC_EDIT_USER_C)-> EnableWindow(false);
+	GetDlgItem(IDC_EDIT_PWD_C)-> EnableWindow(false);
 
 
+	ip_d.EnableWindow(false);
+	GetDlgItem(IDC_EDIT_PORT_D)-> EnableWindow(false);
+	GetDlgItem(IDC_EDIT_USER_D)-> EnableWindow(false);
+	GetDlgItem(IDC_EDIT_PWD_D)-> EnableWindow(false);
 
-
-
-
-
-
-
-
-
-
-
-		ip_a.EnableWindow(true);
-		ip_b.EnableWindow(true);
-		ip_c.EnableWindow(true);
-		ip_d.EnableWindow(true);
-
-
-
-		isAExist.EnableWindow(false);
-		isBExist.EnableWindow(false);
-		isCExist.EnableWindow(false);
-		isDExist.EnableWindow(false);
-
-		ip_a.EnableWindow(false);
-		GetDlgItem(IDC_EDIT_PORT_A)-> EnableWindow(false);
-		GetDlgItem(IDC_EDIT_USER_A)-> EnableWindow(false);
-		GetDlgItem(IDC_EDIT_PWD_A)-> EnableWindow(false);
-
-		ip_b.EnableWindow(false);
-		GetDlgItem(IDC_EDIT_PORT_B)-> EnableWindow(false);
-		GetDlgItem(IDC_EDIT_USER_B)-> EnableWindow(false);
-		GetDlgItem(IDC_EDIT_PWD_B)-> EnableWindow(false);
-
-		ip_c.EnableWindow(false);
-		GetDlgItem(IDC_EDIT_PORT_C)-> EnableWindow(false);
-		GetDlgItem(IDC_EDIT_USER_C)-> EnableWindow(false);
-		GetDlgItem(IDC_EDIT_PWD_C)-> EnableWindow(false);
-
-
-		ip_d.EnableWindow(false);
-		GetDlgItem(IDC_EDIT_PORT_D)-> EnableWindow(false);
-		GetDlgItem(IDC_EDIT_USER_D)-> EnableWindow(false);
-		GetDlgItem(IDC_EDIT_PWD_D)-> EnableWindow(false);
-
-
-
-
-/*
-	
-	*/
 }
+/*************************************************
+Function:   OnBnClickedButtonSave
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnBnClickedButtonSave()
 {
 	CString str;
@@ -693,43 +849,13 @@ void CDialogSetting::OnBnClickedButtonSave()
 
 	saveParams(brightness,contrast,sharpness,saturation,exposuremode,exposuretime,daynight);
 }
-void CDialogSetting::OnCbnSelchangeBrightness()
-{
-	
-}
-
-void CDialogSetting::OnCbnSelchangeContrast()
-{
-	
-}
-
-void CDialogSetting::OnCbnSelchangeSharpness()
-{
-	
-}
-
-void CDialogSetting::OnCbnSelchangeSaturation()
-{
-	
-}
-
-void CDialogSetting::OnCbnSelchangeExpMode()
-{
-	
-}
-
-void CDialogSetting::OnCbnSelchangeExpTime()
-{
-	
-}
-
-void CDialogSetting::OnCbnSelchangeDaynight()
-{
-	
-}
-
-
-
+/*************************************************
+Function:   OnBnClickedButtonLogin
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnBnClickedButtonLogin()
 {
 	CString pwd,cap;
@@ -815,6 +941,13 @@ void CDialogSetting::OnBnClickedButtonLogin()
 		Logout();
 	}
 }
+/*************************************************
+Function:   Logout
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::Logout()
 {
 		isAExist.EnableWindow(false);
@@ -843,10 +976,6 @@ void CDialogSetting::Logout()
 		GetDlgItem(IDC_EDIT_USER_D)-> EnableWindow(false);
 		GetDlgItem(IDC_EDIT_PWD_D)-> EnableWindow(false);
 		
-
-
-
-
 		GetDlgItem(IDC_BRIGHTNESS)-> EnableWindow(false);
 		GetDlgItem(IDC_CONTRAST)-> EnableWindow(false);
 		GetDlgItem(IDC_SHARPNESS)-> EnableWindow(false);
@@ -856,25 +985,20 @@ void CDialogSetting::Logout()
 		GetDlgItem(IDC_DAYNIGHT)-> EnableWindow(false);
 		GetDlgItem(IDC_BUTTON_SAVE)-> EnableWindow(false);
 
-
-
-
-
-
-
 		loginSet.SetWindowTextA(_T("登录"));
 }
-
+/*************************************************
+Function:   OnVScroll
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 void CDialogSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: Add your message handler code here and/or call default
 
 	CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
-
-
-
-
-
 	SCROLLINFO scrollinfo;
 	GetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
 	switch (nSBCode)
@@ -948,7 +1072,13 @@ void CDialogSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 
 }
-
+/*************************************************
+Function:   OnMouseWheel
+Desc:	    
+Input:      
+Return:		SUCCESS 成功
+            FAIL 失败
+**************************************************/
 BOOL CDialogSetting::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	// TODO: Add your message handler code here and/or call default

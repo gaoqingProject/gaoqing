@@ -1,6 +1,8 @@
-// gaoqingDlg.h : header file
-//
-
+/*
+File name:   gaoqingDlg.h
+File Author: Li Weichen
+Date:        2016.3.1
+*/
 #pragma once
 //==============================HIK INCLUDE=====================
 //#include "hik/GeneralDef.h"
@@ -27,197 +29,149 @@ class CgaoqingDlg : public CDialog
 // Construction
 public:
 	CgaoqingDlg(CWnd* pParent = NULL);	// standard constructor
+	
+public:
+	//===== member variables ====
+	CMySliderCtrl playslider;
+	bool adjust;
+	bool camer_a;
+	bool camer_b;
+	bool camer_c;
+	bool camer_d;
+	int playSpeed;
+	BOOL s_Play;
 
-// Dialog Data
-	enum { IDD = IDD_GAOQING_DIALOG };
+	//===== member function ====
+	CString getConfig(CString category,CString item,CString def);
+	DWORD getPlayedTime(bool isRec);
+	int stopVideo(bool isRec);
+	static void setConfig(CString category,CString item,CString val);
+	PARAM_STRU getParams();
+	int saveParams(BYTE bright,BYTE contrast,BYTE sharpness,BYTE saturation,int exp_mode,int exp_time,int daynight);
+	int playVideo(CString patha,CString pathb,CString pathc,CString pathd);
+	DWORD getVideoTime(bool isRec);
+	int playVideoPos(DWORD pos);
 
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+private:
+	
+	//===== member variables ====
+	
+	CTabCtrl tabSettings;
+	CDialogLogin dLogin;
+	CDialogFind dFind;
+	CDialogSetting dSetting;
 
 
+	CString train_id;
+	DWORD stime;
+	int maxScreen;
+	bool maxScreen_isMax;
+	CString path;
+	int slowtimes;
 	bool direction;
 	unsigned int car_n;
-
 	char car_number[20]; 
 	CString index_str;
 	unsigned int car_speed;
-
 	bool is_minimized;
-
-
-
-
-
-
-
-
-
-
-	
-
 	CString foldername;
 	CString timename;
 	HANDLE pFile;
-	//static bool grab_exist;
 
-
-
-//===============HIK Variables==================
 	LONG m_lPlayHandle;
-
 	CIPAddressCtrl	m_ctrlDevIp;
 	UINT	m_nDevPort;
 	CString	m_csUser;
 	CString	m_csPWD;
 	HTREEITEM m_hDevItem;
-	//function
-	BOOL DoLogin();
-	//void DoGetDeviceResoureCfg();
-	//void GetDecoderCfg();
-	afx_msg void OnClose();
-	void StopPlay();
-	void StopRecord();
-	void StartPlay(int iChanIndex);
-	void StartRecord();
-	void PlayBack();
 	HWND m_hPlayWnd;
-	void initView();
-	void post_message(LPCTSTR format, ...);
-	void OnOK();
 
+	//===== camera variables ====
 	HikController *mHik_a;
 	HikController *mHik_b;
 	HikController *mHik_c;
 	HikController *mHik_d;
-	
-public:
-	CString getConfig(CString category,CString item,CString def);
-	static void setConfig(CString category,CString item,CString val);
-	bool playVideo(CString patha,CString pathb,CString pathc,CString pathd);
-	int stopVideo(bool isRec);
-	int pauseVideo();
-	int resumeVideo();
-	int fastVideo();
-	int slowVideo();
-	int saveParams(BYTE bright,BYTE contrast,BYTE sharpness,BYTE saturation,int exp_mode,int exp_time,int daynight);
-	PARAM_STRU getParams();
 
-	DWORD getPlayedTime(bool isRec);
-
-	DWORD getVideoTime(bool isRec);
-	int playVideoPos(DWORD pos);
-	CString getCStringFromConfig(CString cam,CString sub);
-	bool loginCamera();
-	void logoutCamera();
-
-	void startUART();
-	void stopUART();
-	CSerialPort *ser_com;
-
-	static char rx_ser[50];
-	static int  count_ser;
-	static int  longth_ser;
-	static char command_ser;
-
-	void ser_com_read(char rd);
-	void Command_Disposal_Ser(char command);
+	//===== UART variables ====
 	unsigned int Port_N        ;
 	unsigned int Port_BAUD     ;
     char         Port_PARITY   ;
 	unsigned int Port_DBITS    ;
 	unsigned int Port_STOP     ;
- 
-	//void OnSysCommand(UINT nID, LPARAM lParam);
+
+	CSerialPort *ser_com;
+	static char rx_ser[50];
+	static int  count_ser;
+	static int  longth_ser;
+	static char command_ser;
+	
+	//===== db variables ====
+	CDatabase m_db; 
+	CRecordset rs_train;//,rs_details;
+	
+
+	//===== layout variables ====
+	CRect screenA,screenB,screenC,screenD,screenMax,screenProcess,screenPlay,screenFast,screenSlow;
+	
+
+	//===== member function ====
+	void initParam();
+	int pauseVideo();
+	int resumeVideo();
+	int fastVideo();
+	int slowVideo();
+	CString getCStringFromConfig(CString cam,CString sub);
+	bool loginCamera();
+	void logoutCamera();
+	void startUART();
+	void stopUART();
+	void ser_com_read(char rd);
+	void Command_Disposal_Ser(char command);
 	CRect ChangeSize(CWnd *pWnd, int left, int right, int width, int height);
 	CRect getSize(CWnd *pWnd);
 	void saveSize();
 	void restoreSize();
-
 	void ShowLivePlayBackState();
 	int playLive(bool display);
+	void StopPlay();
+	void StopRecord();
+	void StartPlay(int iChanIndex);
+	void StartRecord();
+	void PlayBack();
+	void initView();
+	void post_message(LPCTSTR format, ...);
 
-
-
-	bool camer_a;
-	bool camer_b;
-	bool camer_c;
-	bool camer_d;
-	BOOL s_Play;
-	CRect screenA,screenB,screenC,screenD,screenMax,screenProcess,screenPlay,screenFast,screenSlow;
-	CString path;
-	int playSpeed;
-	int slowtimes;
-	bool adjust;
-//==============================================
-private:
-
-	CString train_id;
-	DWORD stime;
-	void initParam();
-	CDatabase m_db; 
-	CRecordset rs_train;//,rs_details;
-	int maxScreen;
-	bool maxScreen_isMax;
-	
-	
+	//===== message fuction =====
+	afx_msg void OnBnClickedCancel();
+	afx_msg void OnEnChangeEditPort();
+	afx_msg void OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMReleasedcaptureSliderPlay(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedButtonRecPlay();
+	afx_msg void OnBnClickedButtonRecFast();
+	afx_msg void OnBnClickedButtonRecSlow();
+	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnStnDblclickStaticPlayA();
+	afx_msg void OnStnDblclickStaticPlayB();
+	afx_msg void OnStnDblclickStaticPlayC();
+	afx_msg void OnStnDblclickStaticPlayD();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnClose();
+	afx_msg void OnPaint();
+	afx_msg HCURSOR OnQueryDragIcon();
+	void OnOK();
+ 
 // Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+	virtual BOOL OnInitDialog();
+// Dialog Data
+	enum { IDD = IDD_GAOQING_DIALOG };
 	HICON m_hIcon;
 
 	// Generated message map functions
-	virtual BOOL OnInitDialog();
-	afx_msg void OnPaint();
-	afx_msg HCURSOR OnQueryDragIcon();
+	
+	
 	DECLARE_MESSAGE_MAP()
-
-public:
-	afx_msg void OnBnClickedCancel();
-public:
-	afx_msg void OnLogin();
-public:
-	afx_msg void OnBnClickedButton2();
-public:
-	afx_msg void OnBnClickedButton3();
-public:
-	afx_msg void OnEnChangeEditPort();
-public:
-	afx_msg void OnBnClickedButton1();
-public:
-	CTabCtrl tabSettings;
-	CDialogLogin dLogin;
-	CDialogFind dFind;
-	CDialogSetting dSetting;
-public:
-	afx_msg void OnBnDoubleclickedButton2();
-public:
-	afx_msg void OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult);
-
-public:
-	CMySliderCtrl playslider;
-public:
-	afx_msg void OnNMReleasedcaptureSliderPlay(NMHDR *pNMHDR, LRESULT *pResult);
-public:
-	afx_msg void OnBnClickedButtonRecPlay();
-public:
-	afx_msg void OnBnClickedButtonRecFast();
-public:
-	afx_msg void OnBnClickedButtonRecSlow();
-
-
-public:
-	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-public:
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-public:
-	afx_msg void OnStnDblclickStaticPlayA();
-public:
-	afx_msg void OnStnDblclickStaticPlayB();
-public:
-	afx_msg void OnStnDblclickStaticPlayC();
-public:
-	afx_msg void OnStnDblclickStaticPlayD();
-public:
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
- 
 
 };

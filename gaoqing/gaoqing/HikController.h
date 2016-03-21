@@ -1,3 +1,8 @@
+/*
+File name:   HikController.h
+File Author: Li Weichen
+Date:        2016.3.1
+*/
 #pragma once
 #include "hik/GeneralDef.h"
 #include "winnt.h"
@@ -20,8 +25,8 @@ public:
 	bool playliveHik(bool isPlay);
 	bool stopplayliveHik();
 	
-	bool savefileHik(CString file);
-	bool stopsavefileHik();
+	int savefileHik(CString file);
+	int stopsavefileHik();
 	
 	
 	//replay fuctions
@@ -45,10 +50,11 @@ public:
 	PARAM_STRU getParamHik();
 
 
-	bool rec;
+	
 
 //============================================ Member Variables ===================
-	
+	bool rec; //is record display
+	//====config variables
 	HWND mWind;
 	LONG mPlay_no;
 	CString mIp;
